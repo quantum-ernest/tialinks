@@ -1,5 +1,3 @@
-from typing import Optional
-
 from models import Base
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Mapped, Session, relationship
@@ -7,9 +5,9 @@ from utils import extract_referer
 
 
 class RefererMapper(Base):
-    full_url: Mapped[Optional[str]]
-    domain: Mapped[Optional[str]]
-    path: Mapped[Optional[str]]
+    full_url: Mapped[str | None]
+    domain: Mapped[str | None]
+    path: Mapped[str | None]
 
     click: Mapped["ClickMapper"] = relationship(back_populates="referrer")
 

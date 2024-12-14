@@ -1,5 +1,3 @@
-from typing import Optional
-
 from models import Base
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Mapped, Session, relationship
@@ -7,10 +5,10 @@ from utils import extract_location
 
 
 class LocationMapper(Base):
-    continent: Mapped[Optional[str]]
-    country: Mapped[Optional[str]]
-    region: Mapped[Optional[str]]
-    city: Mapped[Optional[str]]
+    continent: Mapped[str | None]
+    country: Mapped[str | None]
+    region: Mapped[str | None]
+    city: Mapped[str | None]
 
     click: Mapped["ClickMapper"] = relationship(back_populates="location")
 

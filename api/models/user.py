@@ -1,5 +1,3 @@
-from typing import Optional
-
 from models import Base
 from pydantic import EmailStr
 from sqlalchemy import select
@@ -8,7 +6,7 @@ from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 
 class UserMapper(Base):
     email: Mapped[str] = mapped_column(unique=True)
-    name: Mapped[Optional[str]]
+    name: Mapped[str | None]
 
     link: Mapped["LinkMapper"] = relationship(back_populates="user")
     click: Mapped["ClickMapper"] = relationship(back_populates="user")
