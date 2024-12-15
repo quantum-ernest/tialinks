@@ -19,7 +19,7 @@ class ClickMapper(Base):
     link: Mapped["LinkMapper"] = relationship(back_populates="click")
     user: Mapped["UserMapper"] = relationship(back_populates="click")
     user_agent: Mapped["UserAgentMapper"] = relationship(back_populates="click")
-    referrer: Mapped["ReferrerMapper"] = relationship(back_populates="click")
+    referer: Mapped["ReferrerMapper"] = relationship(back_populates="click")
     location: Mapped["LocationMapper"] = relationship(back_populates="click")
 
     @classmethod

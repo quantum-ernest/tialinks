@@ -9,7 +9,7 @@ class RefererMapper(Base):
     domain: Mapped[str | None]
     path: Mapped[str | None]
 
-    click: Mapped["ClickMapper"] = relationship(back_populates="referrer")
+    click: Mapped["ClickMapper"] = relationship(back_populates="referer")
 
     @classmethod
     def create(cls, session: Session, **kwargs):
