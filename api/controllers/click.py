@@ -16,7 +16,7 @@ from services import IsAuthenticated
 router = APIRouter(tags=["CLICK"])
 
 
-@router.get("/{shortcode}")
+@router.get("/{shortcode}", response_class=RedirectResponse)
 async def redirect(
     shortcode: str,
     request: Request,
@@ -28,8 +28,6 @@ async def redirect(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"TiaLinks: Unable to locate short url /{shortcode}",
         )
-    link.count += 1
-    session.commit()
     user_agent_data = request.headers.get("User-Agent")
     user_agent_id = (
         UserAgentMapper.create(session=session, user_agent=user_agent_data)
@@ -53,10 +51,12 @@ async def redirect(
         "user_id": link.user_id,
         "user_agent_id": user_agent_id,
         "location_id": location_id,
-        "referrer": referer_id,
+        "referer_id": referer_id,
     }
     ClickMapper.create(session=session, data=click_obj)
-    return RedirectResponse(url=link.original_url)
+    link.count += 1
+    session.commit()
+    return link.original_url
 
 
 @router.get("/link/{link_id}", response_model=List[ClickSchemaOut])
