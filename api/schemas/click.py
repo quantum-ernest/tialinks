@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 from schemas import (
@@ -10,7 +12,7 @@ from schemas import (
 
 class ClickSchemaOut(BaseModel):
     id: int
-    user: UserSchemaOut
-    user_agent: UserAgentSchemaOut
-    referrer: RefererSchemaOut
-    location: LocationSchemaOut
+    user: Optional[UserSchemaOut] = None
+    user_agent: Optional[UserAgentSchemaOut] = None
+    referer: Optional[RefererSchemaOut] = None
+    location: Optional[LocationSchemaOut] = None
