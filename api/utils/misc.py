@@ -29,11 +29,11 @@ def extract_user_agent(value: str) -> dict:
 
 
 def extract_referer(value: str) -> dict:
-    referrer = urlparse(value)
+    referer = urlparse(value)
     data = {
         "full_url": value,
-        "domain": referrer.netloc if referrer.netloc else None,
-        "path": referrer.path if referrer.path else None,
+        "domain": referer.netloc if referer.netloc else None,
+        "path": referer.path if referer.path else None,
     }
     return {k: v for k, v in data.items() if v}
 

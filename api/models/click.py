@@ -9,8 +9,8 @@ class ClickMapper(Base):
     user_agent_id: Mapped[int] = mapped_column(
         ForeignKey("user_agent.id", ondelete="SET NULL")
     )
-    referrer_id: Mapped[int | None] = mapped_column(
-        ForeignKey("referrer.id", ondelete="SET NULL")
+    referer_id: Mapped[int | None] = mapped_column(
+        ForeignKey("referer.id", ondelete="SET NULL")
     )
     location_id: Mapped[int] = mapped_column(
         ForeignKey("location.id", ondelete="SET NULL")
@@ -19,7 +19,7 @@ class ClickMapper(Base):
     link: Mapped["LinkMapper"] = relationship(back_populates="click")
     user: Mapped["UserMapper"] = relationship(back_populates="click")
     user_agent: Mapped["UserAgentMapper"] = relationship(back_populates="click")
-    referer: Mapped["ReferrerMapper"] = relationship(back_populates="click")
+    referer: Mapped["RefererMapper"] = relationship(back_populates="click")
     location: Mapped["LocationMapper"] = relationship(back_populates="click")
 
     @classmethod
