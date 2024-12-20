@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from controllers import auth_router, user_router, link_router, click_router
+from controllers import auth_router, user_router, link_router, click_router, utm_router
 from fastapi.responses import RedirectResponse
 
 app = FastAPI(
@@ -13,6 +13,7 @@ app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(link_router)
 app.include_router(click_router)
+app.include_router(utm_router)
 
 
 @app.get("/")
