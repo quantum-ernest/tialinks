@@ -63,7 +63,13 @@ class AuthService:
     @classmethod
     def send_otp_via_email(cls, email: EmailStr) -> bool:
         otp = generate_otp()
-        _redis.setex(name=email, value=otp, time=300)
+        try:
+            _redis.setex(name=email, value=otp, time=300)
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error while saving OTP: {e}",
+            )
         mail_massage = login_otp_template.replace("{{otp}}", otp)
         mail_service.send_mail(email, "OTP for Login", mail_massage)
         return True
