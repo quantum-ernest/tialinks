@@ -5,5 +5,6 @@ from .misc import (
     extract_location,
     extract_user_agent,
     extract_referer,
+    extract_utm_data,
 )
 from .mail_templates import login_otp_template
