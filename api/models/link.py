@@ -1,18 +1,23 @@
 from models import Base
 from sqlalchemy import ForeignKey, select
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
+from typing import Optional
 
 
 class LinkMapper(Base):
     original_url: Mapped[str]
     shortcode: Mapped[str] = mapped_column(unique=True)
     count: Mapped[int] = mapped_column(default=0)
+    utm_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("utm.id", ondelete="SET NULL")
+    )
     user_id: Mapped[int] = mapped_column(
-        ForeignKey("user.id", ondelete="SET NULL"), nullable=False
+        ForeignKey("user.id", ondelete="SET NULL"),
     )
 
     user: Mapped["UserMapper"] = relationship(back_populates="link")
     click: Mapped["ClickMapper"] = relationship(back_populates="link")
+    utm: Mapped["UtmMapper"] = relationship(back_populates="link")
 
     @classmethod
     def get_all(cls, session: Session, user_id: int):
