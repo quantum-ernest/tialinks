@@ -28,7 +28,7 @@ class Base(DeclarativeBase):
         return session.scalars(select(cls).order_by(cls.id.desc())).all()
 
     @classmethod
-    def get_by_id(cls, session: Session, pk_id):
+    def get_by_id(cls, session: Session, pk_id: int, **kwargs):
         return session.scalars(select(cls).where(cls.id == pk_id)).first()
 
     @classmethod
