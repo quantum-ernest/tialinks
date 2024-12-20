@@ -17,17 +17,21 @@ class LocationMapper(Base):
         ip_address = kwargs.get("ip_address")
         location_data = extract_location(ip_address)
         query = select(cls)
-        if location_data.get("continent"):
-            query = query.filter_by(continent=location_data["continent"])
-        if location_data.get("country"):
-            query = query.filter_by(country=location_data["country"])
-        if location_data.get("region"):
-            query = query.filter_by(region=location_data["region"])
-        if location_data.get("city"):
-            query = query.filter_by(city=location_data["city"])
-        record = session.scalars(query).first()
-        return (
-            record.id
-            if record
-            else session.scalars(insert(cls).returning(cls.id), location_data).first()
-        )
+        if location_data:
+            if location_data.get("continent"):
+                query = query.filter_by(continent=location_data["continent"])
+            if location_data.get("country"):
+                query = query.filter_by(country=location_data["country"])
+            if location_data.get("region"):
+                query = query.filter_by(region=location_data["region"])
+            if location_data.get("city"):
+                query = query.filter_by(city=location_data["city"])
+            record = session.scalars(query).first()
+            return (
+                record.id
+                if record
+                else session.scalars(
+                    insert(cls).returning(cls.id), location_data
+                ).first()
+            )
+        return None
