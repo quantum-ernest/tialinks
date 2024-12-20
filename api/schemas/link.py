@@ -1,8 +1,8 @@
 from datetime import datetime
 
 from pydantic import BaseModel, AnyUrl
-
-from schemas import UserSchemaIn
+from typing import Optional
+from schemas import UserSchemaOut, UtmLinkSchemaOut
 
 
 class LinkSchemaIn(BaseModel):
@@ -12,6 +12,7 @@ class LinkSchemaIn(BaseModel):
 class LinkSchemaOut(LinkSchemaIn):
     shortcode: str
     count: int
-    user: UserSchemaIn
+    utm: Optional[UtmLinkSchemaOut] = None
+    user: UserSchemaOut
     created_at: datetime
     id: int
