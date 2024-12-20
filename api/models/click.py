@@ -1,3 +1,5 @@
+from typing import Optional
+
 from models import Base
 from sqlalchemy import ForeignKey, select
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
@@ -6,13 +8,13 @@ from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 class ClickMapper(Base):
     link_id: Mapped[int] = mapped_column(ForeignKey("link.id", ondelete="SET NULL"))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
-    user_agent_id: Mapped[int] = mapped_column(
+    user_agent_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("user_agent.id", ondelete="SET NULL")
     )
-    referer_id: Mapped[int | None] = mapped_column(
+    referer_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("referer.id", ondelete="SET NULL")
     )
-    location_id: Mapped[int] = mapped_column(
+    location_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("location.id", ondelete="SET NULL")
     )
 
