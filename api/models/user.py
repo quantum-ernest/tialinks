@@ -10,6 +10,7 @@ class UserMapper(Base):
 
     link: Mapped["LinkMapper"] = relationship(back_populates="user")
     click: Mapped["ClickMapper"] = relationship(back_populates="user")
+    utm: Mapped["UtmMapper"] = relationship(back_populates="user")
 
     @classmethod
     def get_by_email(cls, session: Session, email: EmailStr):
