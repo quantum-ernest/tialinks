@@ -7,15 +7,18 @@ from schemas import UserSchemaOut
 
 
 class UtmSchema(BaseModel):
-    name: str
+    campaign: str
     source: str
     medium: Optional[str] = None
+
 
 class UtmSchemaOut(UtmSchema):
     id: int
     user: UserSchemaOut
     created_at: datetime
 
+
 class UtmLinkSchemaOut(UtmSchema):
     id: int
+    user: UserSchemaOut
     created_at: datetime
