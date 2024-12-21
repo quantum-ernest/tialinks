@@ -8,6 +8,7 @@ class LinkMapper(Base):
     original_url: Mapped[str]
     shortcode: Mapped[str] = mapped_column(unique=True)
     count: Mapped[int] = mapped_column(default=0)
+    qrcode: Mapped[Optional[str]]
     utm_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("utm.id", ondelete="SET NULL")
     )
@@ -33,3 +34,9 @@ class LinkMapper(Base):
     def validate_shortcode(cls, session: Session, shortcode: str) -> bool:
         record = session.scalars(select(cls).where(cls.shortcode == shortcode)).all()
         return True if record else False
+
+    @classmethod
+    def get_qrcode(cls, session: Session, filename: str, user_id: int):
+        return session.scalars(
+            select(cls.qrcode).where(cls.user_id == user_id, cls.qrcode == filename)
+        ).first()
