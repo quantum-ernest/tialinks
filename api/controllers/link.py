@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from core import get_db_session
+from core import get_db_session, env
 from typing import List
 from models import LinkMapper, UtmMapper
 from schemas import LinkSchemaOut, LinkSchemaIn
-from services import IsAuthenticated
+from services import IsAuthenticated, generate_qr_codes
 from utils import generate_readable_short_code, extract_utm_data
 
 router = APIRouter(prefix="/api/link", tags=["LINK"])
@@ -44,7 +44,7 @@ async def create(
         source=utm_data.get("utm_source"),
         user_id=auth_user.get("user_id"),
     )
-    if not utm:
+    if not utm and utm_data.get("utm_campaign") and utm_data.get("utm_source"):
         utm = UtmMapper.create(
             session=session,
             data={
@@ -55,10 +55,13 @@ async def create(
             },
         )
 
+    qrcode = generate_qr_codes(f"{env.BASE_URL}/{shortcode}")
+
     data.update(
         {
             "original_url": original_url,
             "shortcode": shortcode,
+            "qrcode": qrcode,
             "utm_id": utm.id if utm else None,
             "user_id": auth_user.get("user_id"),
         }
