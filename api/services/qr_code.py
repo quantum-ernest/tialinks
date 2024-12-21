@@ -1,3 +1,4 @@
+import uuid
 import qrcode
 
 
@@ -7,8 +8,6 @@ def generate_qr_codes(data: str):
     qr.add_data(name)
     qr.make(fit=True)
     qrcode_image = qr.make_image(fill_color="black", back_color="white")
-    qrcode_image.show()
-    return qrcode_image
-
-
-# generate_qr_codes("hello world")
+    filename = f"{uuid.uuid4()}.png"
+    qrcode_image.save(f"assets/images/{filename}")
+    return filename
