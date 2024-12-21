@@ -16,6 +16,7 @@ class EnvConfig(BaseSettings):
     EMAIL_SERVER_USE_TLS: bool
     EMAIL_SERVER_ADDRESS: EmailStr
     EMAIL_HOST_PASSWORD: str
+    BASE_URL: str
     REDIS_HOST: str | None = "localhost"
     REDIS_PORT: int | None = "6379"
 
