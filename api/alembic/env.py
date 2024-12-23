@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 from core import DATABASE_URL
-from models import Base, ClickMapper, UtmMapper, LinkMapper, LocationMapper, UserMapper, UserAgentMapper, RefererMapper
+from models import Base, ClickMapper, UtmMapper, LinkMapper, LocationMapper, UserMapper, UserAgentMapper, RefererMapper, LinkInteractionMapper
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
