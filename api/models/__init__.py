@@ -6,3 +6,4 @@ from .referer import RefererMapper
 from .utm import UtmMapper
 from .link import LinkMapper
 from .click import ClickMapper
+from .link_interaction import LinkInteractionMapper
