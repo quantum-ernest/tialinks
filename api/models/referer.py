@@ -22,7 +22,7 @@ class RefererMapper(Base):
             query = query.filter_by(path=referer_data["path"])
         record = session.scalars(query).first()
         return (
-            record.id
+            record
             if record
-            else session.scalars(insert(cls).returning(cls.id), referer_data).first()
+            else session.scalars(insert(cls).returning(cls), referer_data).first()
         )
