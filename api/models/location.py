@@ -28,10 +28,8 @@ class LocationMapper(Base):
                 query = query.filter_by(city=location_data["city"])
             record = session.scalars(query).first()
             return (
-                record.id
+                record
                 if record
-                else session.scalars(
-                    insert(cls).returning(cls.id), location_data
-                ).first()
+                else session.scalars(insert(cls).returning(cls), location_data).first()
             )
         return None
