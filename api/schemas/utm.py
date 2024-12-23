@@ -20,5 +20,4 @@ class UtmSchemaOut(UtmSchema):
 
 class UtmLinkSchemaOut(UtmSchema):
     id: int
-    user: UserSchemaOut
     created_at: datetime
