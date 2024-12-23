@@ -26,8 +26,8 @@ class UserAgentMapper(Base):
                 query = query.filter_by(device=user_agent["device"])
             record = session.scalars(query).first()
             return (
-                record.id
+                record
                 if record
-                else session.scalars(insert(cls).returning(cls.id), user_agent).first()
+                else session.scalars(insert(cls).returning(cls), user_agent).first()
             )
         return None
