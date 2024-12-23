@@ -1,5 +1,12 @@
 from fastapi import FastAPI
-from controllers import auth_router, user_router, link_router, click_router, utm_router
+from controllers import (
+    auth_router,
+    user_router,
+    link_router,
+    click_router,
+    utm_router,
+    analysis_router,
+)
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -22,6 +29,7 @@ app.include_router(user_router)
 app.include_router(link_router)
 app.include_router(click_router)
 app.include_router(utm_router)
+app.include_router(analysis_router)
 
 
 @app.get("/")
