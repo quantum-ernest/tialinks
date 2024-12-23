@@ -9,6 +9,8 @@ from models import (
     UserAgentMapper,
     LocationMapper,
     RefererMapper,
+    LinkInteractionMapper,
+    UtmMapper,
 )
 from schemas import ClickSchemaOut
 from services import IsAuthenticated
@@ -29,33 +31,58 @@ async def redirect(
             detail=f"TiaLinks: Unable to locate short url /{shortcode}",
         )
     user_agent_data = request.headers.get("User-Agent")
-    user_agent_id = (
+    user_agent = (
         UserAgentMapper.create(session=session, user_agent=user_agent_data)
         if user_agent_data
         else None
     )
 
     ip_address = request.client.host
-    location_id = (
+    location = (
         LocationMapper.create(session=session, ip_address=ip_address)
         if user_agent_data
         else None
     )
 
-    referer = request.headers.get("Referer")
-    referer_id = (
-        RefererMapper.create(session=session, referer=referer) if referer else None
+    referer_data = request.headers.get("Referer")
+    referer = (
+        RefererMapper.create(session=session, referer=referer_data)
+        if referer_data
+        else None
     )
     click_obj = {
         "link_id": link.id,
         "user_id": link.user_id,
-        "user_agent_id": user_agent_id,
-        "location_id": location_id,
-        "referer_id": referer_id,
+        "user_agent_id": user_agent.id if user_agent else None,
+        "location_id": location.id if location else None,
+        "referer_id": referer.id if referer else None,
     }
-    ClickMapper.create(session=session, data=click_obj)
+    click = ClickMapper.create(session=session, data=click_obj)
     link.count += 1
     session.commit()
+    utm = (
+        UtmMapper.get_by_id(session=session, pk_id=link.utm_id) if link.utm_id else None
+    )
+    link_interaction = {
+        "created_at": click.created_at,
+        "link_id": link.id,
+        "shortcode": shortcode,
+        "original_url": link.original_url,
+        "campaign": utm.campaign if utm else None,
+        "source": utm.source if utm else None,
+        "medium": utm.medium if utm else None,
+        "browser": user_agent.browser if user_agent else None,
+        "operating_system": user_agent.operating_system if user_agent else None,
+        "device": user_agent.device if user_agent else None,
+        "domain": referer.domain if referer else None,
+        "path": referer.path if referer else None,
+        "continent": location.continent if location else None,
+        "country": location.country if location else None,
+        "region": location.region if location else None,
+        "city": location.city if location else None,
+        "user_id": link.user_id,
+    }
+    LinkInteractionMapper.create(session=session, data=link_interaction)
     return link.original_url
 
 
