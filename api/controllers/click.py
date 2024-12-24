@@ -61,7 +61,9 @@ async def redirect(
     link.count += 1
     session.commit()
     utm = (
-        UtmMapper.get_by_id(session=session, pk_id=link.utm_id) if link.utm_id else None
+        UtmMapper.get_by_id(session=session, pk_id=link.utm_id, user_id=link.user_id)
+        if link.utm_id
+        else None
     )
     link_interaction = {
         "created_at": click.created_at,
