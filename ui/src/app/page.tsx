@@ -1,5 +1,5 @@
 import styles from "./page.module.css";
-import RequestOTPForm from "@/app/components/RequestOTPForm";
+import RequestOTPForm from "@/components/RequestOTPForm";
 
 export default function Home() {
     return (
@@ -7,9 +7,7 @@ export default function Home() {
             backgroundImage: `url("/background.jpg")`, backgroundSize: "cover", backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center', width: '100%', height: '100%',
         }}>
-            <main className={styles.main}>
-                <RequestOTPForm/>
-            </main>
+            <RequestOTPForm/>
         </div>
     );
 }
