@@ -19,11 +19,11 @@ function OTPLoginForm({email}: { email: string }) {
             if (!response.ok) {
                 throw new Error(response.statusText);
             }
-            console.log(response)
+            const data = await response.json()
+            localStorage.setItem("access_token", data.token);
         } catch (error) {
             console.error(error)
         }
-
     };
 
     return (
