@@ -3,7 +3,7 @@ import {Button, Form, Input} from "antd";
 import {MailOutlined} from "@ant-design/icons";
 
 
-function RequestOTPForm() {
+function RequestOTPForm({setEmail}: {setEmail: (email: string) => void}) {
     const onFinish = async (values: { email: string }) => {
         const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
         try {
@@ -18,6 +18,7 @@ function RequestOTPForm() {
             if (!response.ok) {
                 throw new Error(`Failed to request OTP: ${response.statusText}`);
             }
+            setEmail(values.email);
         } catch (error) {
             console.error('Error:', error);
         }
