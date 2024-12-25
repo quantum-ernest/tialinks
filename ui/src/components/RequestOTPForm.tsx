@@ -2,8 +2,11 @@
 import {Button, Form, Input} from "antd";
 import {MailOutlined} from "@ant-design/icons";
 
+type SetEmail = {
+    setEmail: (email: string) => void;
+};
 
-function RequestOTPForm({setEmail}: {setEmail: (email: string) => void}) {
+function RequestOTPForm({setEmail}: SetEmail) {
     const onFinish = async (values: { email: string }) => {
         const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
         try {
