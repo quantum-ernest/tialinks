@@ -1,13 +1,14 @@
 "use client";
 import {Button, Form, Input} from "antd";
 import {MailOutlined} from "@ant-design/icons";
+import {Email} from "@/components/types";
 
 type SetEmail = {
     setEmail: (email: string) => void;
 };
 
 function RequestOTPForm({setEmail}: SetEmail) {
-    const onFinish = async (values: { email: string }) => {
+    const onFinish = async (values: Email) => {
         const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
         try {
             const response = await fetch(apiUrl + '/api/auth/otp/email/generate', {
