@@ -1,7 +1,7 @@
 "use client"
 import {Form} from "antd"
 import {InputOTP} from 'antd-input-otp';
-import {Email} from "@/app/components/types";
+import {Email} from "@/components/types";
 import {useState} from "react";
 
 type OTP = {
