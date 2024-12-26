@@ -11,10 +11,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <title>TiaLinks - Open Source URL Shortener</title>
-        <meta name="description" content="TiaLinks is an open-source, powerful, and easy-to-use URL shortener for developers and businesses." />
-      </head>
       <body className={inter.className}>
         <ConfigProvider theme={themeConfig}>
           {children}
