@@ -1,14 +1,25 @@
 /* Custom styles for TiaLinks */
 .tialinks-header {
+  padding: 0 50px;
+  background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  width: 100%;
+  z-index: 1000;
 }
 
 .tialinks-hero {
   background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+  padding: 120px 50px 60px;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
 }
 
 .tialinks-feature-card {
+  height: 100%;
   transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
 }
 
 .tialinks-feature-card:hover {
@@ -18,12 +29,39 @@
 
 .tialinks-stats-card {
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .tialinks-stats-card:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .tialinks-footer {
   background-color: #f3f4f6;
+  padding: 48px 0;
+}
+
+.ant-input-search .ant-input {
+  height: 50px;
+  font-size: 16px;
+}
+
+.ant-input-search .ant-input-search-button {
+  height: 50px;
+  font-size: 16px;
+}
+
+.ant-card {
+  border-radius: 12px;
+}
+
+@media (max-width: 768px) {
+  .tialinks-header {
+    padding: 0 20px;
+  }
+
+  .tialinks-hero {
+    padding: 100px 20px 40px;
+    min-height: auto;
+  }
 }
