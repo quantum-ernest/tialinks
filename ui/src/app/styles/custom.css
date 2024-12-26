@@ -17,6 +17,7 @@
 }
 
 .tialinks-feature-card {
+  margin: 10px;
   height: 100%;
   transition: all 0.3s ease;
   border: 1px solid #e5e7eb;
