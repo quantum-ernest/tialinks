@@ -14,10 +14,10 @@ const themeConfig: ThemeConfig = {
     },
     Input: {
       borderRadius: 8,
-      controlHeight: 40,
+      controlHeight: 50,
     },
     Card: {
-      borderRadius: 16,
+      borderRadius: 12,
     },
   },
 }
