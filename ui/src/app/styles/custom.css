@@ -1,0 +1,29 @@
+/* Custom styles for TiaLinks */
+.tialinks-header {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tialinks-hero {
+  background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+}
+
+.tialinks-feature-card {
+  transition: all 0.3s ease;
+}
+
+.tialinks-feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.tialinks-stats-card {
+  transition: all 0.3s ease;
+}
+
+.tialinks-stats-card:hover {
+  transform: scale(1.05);
+}
+
+.tialinks-footer {
+  background-color: #f3f4f6;
+}

@@ -1,7 +1,7 @@
 "use client";
 import {Button, Form, Input} from "antd";
 import {MailOutlined} from "@ant-design/icons";
-import {Email} from "@/components/types";
+import {Email} from "@/app/components/types";
 
 type SetEmail = {
     setEmail: (email: string) => void;
