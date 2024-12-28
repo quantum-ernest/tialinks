@@ -1,7 +1,7 @@
 'use client'
 
 import {useState} from 'react'
-import {Card, Input, Button, Typography, Form, message} from 'antd'
+import {Card, Input, Button, Typography, Form, message, Flex, Row, Col} from 'antd'
 import {MailOutlined, LockOutlined} from '@ant-design/icons'
 import {InputOTP} from 'antd-input-otp';
 import '../styles/login.css'
@@ -19,7 +19,6 @@ export default function LoginPage() {
         setLoading(true)
 
         try {
-            // Replace with actual API call
             const response = await fetch(apiUrl + '/api/auth/otp/email/generate', {
                 method: 'POST',
                 headers: {
@@ -73,10 +72,11 @@ export default function LoginPage() {
     }
 
     return (
+
         <div className="login-container">
             <Card className="login-card">
                 <div className="login-header">
-                    <Title level={2} style={{color: 'white', margin: 0}}>TiaLinks</Title>
+                    <Title level={3} style={{color: 'white', margin: 0}}>TiaLinks</Title>
                 </div>
                 <div className="login-form">
                     {step === 'email' ? (
@@ -93,6 +93,7 @@ export default function LoginPage() {
                                     placeholder="Enter your Email"
                                     size="large"
                                     value={email}
+                                    style={{marginTop: '10px'}}
                                     allowClear
                                     onChange={(e) => setEmail(e.target.value)}
                                     className="login-input"
@@ -116,9 +117,10 @@ export default function LoginPage() {
                                 <InputOTP autoSubmit={handleOtpSubmit} autoFocus={true} inputType="numeric"/>
                             </Form.Item>
                         </Form>
-                )}
+                    )}
+                </div>
+            </Card>
         </div>
-</Card>
-</div>
-)
+
+    )
 }
