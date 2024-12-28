@@ -1,6 +1,6 @@
 import { Inter } from 'next/font/google'
 import { ConfigProvider } from 'antd'
-import themeConfig from './theme/themeConfig'
+import themeConfig from '@/theme/themeConfig'
 
 const inter = Inter({ subsets: ['latin'] })
 

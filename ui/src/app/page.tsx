@@ -3,6 +3,7 @@
 import {useState} from 'react'
 import {
     Layout,
+    Tooltip,
     Typography,
     Input,
     Button,
@@ -22,9 +23,16 @@ import {
     CheckCircleOutlined,
     ThunderboltOutlined,
     LockOutlined,
-    UserOutlined, DownOutlined, LineChartOutlined, TeamOutlined
+    UserOutlined,
+    DownOutlined,
+    LineChartOutlined,
+    TeamOutlined,
+    QrcodeOutlined,
+    ApiOutlined,
+    GlobalOutlined,
+    DashboardOutlined, CheckOutlined, CopyOutlined
 } from '@ant-design/icons'
-import './styles/custom.css'
+import '@/app/styles/custom.css'
 import {SiOpensourceinitiative} from "react-icons/si";
 import {MdOutlineDashboardCustomize, MdOutlineInsights} from "react-icons/md";
 import {GrSecure} from "react-icons/gr";
@@ -32,13 +40,47 @@ import {TbBrandOpenSource} from "react-icons/tb";
 
 const {Header, Content, Footer} = Layout
 const {Title, Paragraph, Text, Link} = Typography
-
 export default function Home() {
     const [url, setUrl] = useState('')
     const [shortUrl, setShortUrl] = useState('')
+    const [copied, setCopied] = useState(false)
+    const [pendingUrl, setPendingUrl] = useState('')
 
-    const handleShorten = () => {
-        setShortUrl(`https://tialinks.com/${Math.random().toString(36).substr(2, 6)}`)
+    const access_token = localStorage.getItem('access_token')
+    const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+    const handleCopy = () => {
+        navigator.clipboard.writeText(shortUrl)
+        setCopied(true)
+        message.success('URL copied to clipboard!')
+        setTimeout(() => setCopied(false), 3000) // Reset copied state after 3 seconds
+    }
+    const handleShorten = async () => {
+        if (access_token) {
+            try {
+                console.log(access_token)
+                const response = await fetch(apiUrl + '/api/link', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${access_token}`,
+                    },
+                    body: JSON.stringify({original_url: url})
+                })
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                const data = await response.json()
+                setShortUrl(`https://tialinks.com/${data.shortcode}`)
+            } catch (error) {
+                message.error('Failed to shorten link')
+            }
+        } else {
+            setPendingUrl(url)
+            window.location.href = '/login'
+
+
+        }
     }
     const handleMenuClick: MenuProps['onClick'] = (e) => {
         alert('Click on menu item.',);
@@ -69,8 +111,7 @@ export default function Home() {
                     </Col>
                     <Col>
                         <Space size="large">
-                            <Button type="link" style={{color: '#4B5563'}}>Features</Button>
-                            <Button type="link" style={{color: '#4B5563'}}>About</Button>
+                            <Button type="link" style={{color: '#4B5563'}}>Donate</Button>
                             <Button type="link" style={{color: '#4B5563'}}>API</Button>
                             <Dropdown menu={menuProps}>
                                 <Button>
@@ -130,22 +171,63 @@ export default function Home() {
                                             alignItems: 'center',
                                             background: '#F9FAFB',
                                             padding: '12px',
-                                            borderRadius: '8px'
+                                            borderRadius: '8px',
+                                            marginBottom: '16px'
                                         }}>
-                                            <a href={shortUrl} target="_blank" rel="noopener noreferrer"
-                                               style={{color: '#7C3AED'}}>
-                                                {shortUrl}
-                                            </a>
+                                            <Tooltip title={copied ? "Copied!" : "Click to copy"} placement="top">
+                                                <Text style={{
+                                                    color: '#7C3AED',
+                                                    cursor: 'pointer',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '8px'
+                                                }}
+                                                      onClick={(e) => {
+                                                          e.preventDefault()
+                                                          handleCopy()
+                                                      }}>
+                                                    {shortUrl}
+                                                    {copied && <CheckOutlined style={{color: '#10B981'}}/>}
+                                                </Text>
+                                            </Tooltip>
                                             <Button
-                                                type="primary"
-                                                onClick={() => navigator.clipboard.writeText(shortUrl)}
-                                                style={{background: '#7C3AED'}}
+                                                type={copied ? "default" : "primary"}
+                                                icon={copied ? <CheckOutlined/> : <CopyOutlined/>}
+                                                onClick={handleCopy}
+                                                style={{
+                                                    background: copied ? '#10B981' : '#7C3AED',
+                                                    borderColor: copied ? '#10B981' : '#7C3AED',
+                                                    color: 'white'
+                                                }}
                                             >
-                                                Copy
+                                                {copied ? 'Copied!' : 'Copy'}
                                             </Button>
                                         </div>
+                                        <Link href="/dashboard">
+                                            <Button
+                                                type="default"
+                                                icon={<DashboardOutlined/>}
+                                                block
+                                                style={{
+                                                    height: '40px',
+                                                    background: '#F3F4F6',
+                                                    borderColor: '#E5E7EB',
+                                                    color: '#4B5563',
+                                                    fontWeight: 'bold',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    gap: '8px',
+                                                    transition: 'all 0.3s ease'
+                                                }}
+                                                className="dashboard-button"
+                                            >
+                                                View Analytics in Dashboard
+                                            </Button>
+                                        </Link>
                                     </div>
-                                )}
+                                )
+                                }
                             </Card>
                         </Col>
                         <Col xs={24} lg={12} style={{marginTop: '16px'}}>
@@ -173,25 +255,65 @@ export default function Home() {
                         <Row>
                             <Col xs={24} md={8} style={{padding: '10px'}}>
                                 <Card className="tialinks-feature-card">
+                                    <LinkOutlined
+                                        style={{fontSize: '48px', color: '#7C3AED', marginBottom: '24px'}}/>
+                                    <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>
+                                        URL Shortening
+                                    </Title>
+                                    <Paragraph style={{color: '#6B7280', fontSize: '16px'}}>
+                                        Create concise, shareable links instantly. Our advanced algorithm ensures unique
+                                        and efficient short URLs.
+                                    </Paragraph>
+                                </Card>
+                            </Col>
+
+                            <Col xs={24} md={8} style={{padding: '10px'}}>
+                                <Card className="tialinks-feature-card">
                                     <LineChartOutlined
                                         style={{fontSize: '48px', color: '#10B981', marginBottom: '24px'}}/>
                                     <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>
                                         Detailed Analytics
                                     </Title>
                                     <Paragraph style={{color: '#6B7280', fontSize: '16px'}}>
-                                        Track clicks, user engagement, and geographical trends.
+                                        Gain insights with detailed click analytics and user engagement, including
+                                        geographic data, referral sources, etc.
                                     </Paragraph>
                                 </Card>
                             </Col>
                             <Col xs={24} md={8} style={{padding: '10px'}}>
                                 <Card className="tialinks-feature-card">
-                                    <MdOutlineDashboardCustomize
-                                        style={{fontSize: '48px', color: '#10B981', marginBottom: '24px'}}/>
+                                    <QrcodeOutlined
+                                        style={{fontSize: '48px', color: '#2C3E50', marginBottom: '24px'}}/>
                                     <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>
-                                        Custom Branding
+                                        QR Code Generation
                                     </Title>
+                                    <Paragraph style={{color: '#6B7280', fontSize: '16px'}}>Automatically generate QR
+                                        codes for your shortened links, perfect for print materials and contactless
+                                        sharing.
+                                    </Paragraph>
+                                </Card>
+                            </Col>
+                            <Col xs={24} md={8} style={{padding: '10px'}}>
+                                <Card className="tialinks-feature-card">
+                                    <ApiOutlined
+                                        style={{fontSize: '48px', color: '#1ABC9C', marginBottom: '24px'}}/>
+                                    <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>
+                                        API Access
+                                    </Title>
+                                    <Paragraph style={{color: '#6B7280', fontSize: '16px'}}>Integrate TiaLinks into your
+                                        applications with our robust and well-documented API.
+                                    </Paragraph>
+                                </Card>
+                            </Col>
+
+                            <Col xs={24} md={8} style={{padding: '10px'}}>
+                                <Card className="tialinks-feature-card">
+                                    <GrSecure style={{fontSize: '48px', color: '#95A5A6', marginBottom: '24px'}}/>
+                                    <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>Secure &
+                                        Reliable</Title>
                                     <Paragraph style={{color: '#6B7280', fontSize: '16px'}}>
-                                        Create links that reflect your brand identity.
+                                        Built with security in mind. Your data is safe and your links are always
+                                        accessible.
                                     </Paragraph>
                                 </Card>
                             </Col>
@@ -208,30 +330,33 @@ export default function Home() {
                             </Col>
                             <Col xs={24} md={8} style={{padding: '10px'}}>
                                 <Card className="tialinks-feature-card">
-                                    <ThunderboltOutlined
-                                        style={{fontSize: '48px', color: '#F59E0B', marginBottom: '24px'}}/>
-                                    <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>Lightning
-                                        Fast</Title>
+                                    <TeamOutlined
+                                        style={{fontSize: '48px', color: '#FF6F61', marginBottom: '24px'}}/>
+                                    <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>
+                                        Team Collaboration
+                                    </Title>
                                     <Paragraph style={{color: '#6B7280', fontSize: '16px'}}>
-                                        Optimized for speed. Shorten URLs instantly and enjoy rapid redirects.
-                                    </Paragraph>
+                                        Work together seamlessly with team management features and shared link
+                                        workspaces. </Paragraph>
                                 </Card>
                             </Col>
+
                             <Col xs={24} md={8} style={{padding: '10px'}}>
                                 <Card className="tialinks-feature-card">
-                                    <GrSecure style={{fontSize: '48px', color: '#3B82F6', marginBottom: '24px'}}/>
-                                    <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>Secure &
-                                        Reliable</Title>
+                                    <GlobalOutlined
+                                        style={{fontSize: '48px', color: '#3B82F6', marginBottom: '24px'}}/>
+                                    <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>
+                                        Custom Domains
+                                    </Title>
                                     <Paragraph style={{color: '#6B7280', fontSize: '16px'}}>
-                                        Built with security in mind. Your data is safe and your links are always
-                                        accessible.
-                                    </Paragraph>
+                                        Use your own domain for branded short links, enhancing trust and recognition
+                                        with your audience.(not available!!) </Paragraph>
                                 </Card>
                             </Col>
                             <Col xs={24} md={8} style={{padding: '10px'}}>
                                 <Card className="tialinks-feature-card">
                                     <TbBrandOpenSource
-                                        style={{fontSize: '48px', color: '#3B82F6', marginBottom: '24px'}}/>
+                                        style={{fontSize: '48px', color: '#FF6F61', marginBottom: '24px'}}/>
                                     <Title level={3} style={{marginBottom: '16px', color: '#1F2937'}}>Free to
                                         Use</Title>
                                     <Paragraph style={{color: '#6B7280', fontSize: '16px'}}>
