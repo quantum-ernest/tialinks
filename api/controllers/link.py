@@ -13,7 +13,7 @@ from utils import generate_readable_short_code, extract_utm_data
 router = APIRouter(prefix="/api/link", tags=["LINK"])
 
 
-@router.get("/", response_model=List[LinkSchemaOut])
+@router.get("", response_model=List[LinkSchemaOut])
 async def get_all(
     session: Session = Depends(get_db_session),
     auth_user: dict = Depends(IsAuthenticated()),
@@ -21,7 +21,7 @@ async def get_all(
     return LinkMapper.get_all(session=session, user_id=auth_user.get("user_id"))
 
 
-@router.post("/", response_model=LinkSchemaOut)
+@router.post("", response_model=LinkSchemaOut)
 async def create(
     data: LinkSchemaIn,
     session: Session = Depends(get_db_session),
