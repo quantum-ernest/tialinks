@@ -1,7 +1,9 @@
+from sqlalchemy.util import hybridproperty
+
 from models import Base
 from sqlalchemy import ForeignKey, select, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
-from typing import Optional
+from typing import Optional, List
 
 
 class UtmMapper(Base):
@@ -10,9 +12,13 @@ class UtmMapper(Base):
     medium: Mapped[Optional[str]]
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
     user: Mapped["UserMapper"] = relationship(back_populates="utm")
-    link: Mapped["LinkMapper"] = relationship(back_populates="utm")
+    link: Mapped[List["LinkMapper"]] = relationship(back_populates="utm")
 
     __table_args__ = (UniqueConstraint("campaign", "source", "user_id"),)
+
+    @hybridproperty
+    def link_count(self) -> int:
+        return len(self.link)
 
     @classmethod
     def get_by_id(cls, session: Session, pk_id: int, **kwargs):
