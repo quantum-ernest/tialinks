@@ -15,6 +15,7 @@ class UtmSchema(BaseModel):
 class UtmSchemaOut(UtmSchema):
     id: int
     user: UserSchemaOut
+    link_count: int
     created_at: datetime
 
 
