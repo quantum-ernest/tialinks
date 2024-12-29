@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react'
-import {message, notification} from 'antd'
+import {notification} from 'antd'
 
 export interface UtmParams {
     id: number
