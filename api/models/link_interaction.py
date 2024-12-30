@@ -1,6 +1,6 @@
 from typing import Optional
 from datetime import datetime
-from queries import * # noqa: F403
+from queries import *  # noqa: F403
 from sqlalchemy import PrimaryKeyConstraint, text
 
 from models import Base

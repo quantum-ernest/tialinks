@@ -1,5 +1,5 @@
 from models import Base
-from sqlalchemy import ForeignKey, select
+from sqlalchemy import ForeignKey, select, func
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from typing import Optional
 
@@ -36,7 +36,13 @@ class LinkMapper(Base):
         return True if record else False
 
     @classmethod
+    def get_total_links(cls, session: Session, user_id: int):
+        return session.scalars(
+            select(func.count(cls.id)).where(cls.user_id == user_id)
+        ).first()
+
+    @classmethod
     def get_qrcode(cls, session: Session, filename: str, user_id: int):
         return session.scalars(
             select(cls.qrcode).where(cls.user_id == user_id, cls.qrcode == filename)
-        ).first()
+        )
