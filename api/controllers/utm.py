@@ -6,7 +6,7 @@ from models import UtmMapper
 from schemas import UtmSchemaOut, UtmSchema
 from services import IsAuthenticated
 
-router = APIRouter(prefix="/api/utm", tags=["UTM"])
+router = APIRouter(prefix="/api/utms", tags=["UTM"])
 
 
 @router.get("", response_model=List[UtmSchemaOut])

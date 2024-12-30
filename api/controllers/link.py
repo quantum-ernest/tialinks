@@ -10,7 +10,7 @@ from schemas import LinkSchemaOut, LinkSchemaIn
 from services import IsAuthenticated, generate_qr_codes
 from utils import generate_readable_short_code, extract_utm_data
 
-router = APIRouter(prefix="/api/link", tags=["LINK"])
+router = APIRouter(prefix="/api/links", tags=["LINK"])
 
 
 @router.get("", response_model=List[LinkSchemaOut])

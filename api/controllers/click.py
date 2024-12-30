@@ -88,7 +88,7 @@ async def redirect(
     return link.original_url
 
 
-@router.get("/link/{link_id}", response_model=List[ClickSchemaOut])
+@router.get("/links/{link_id}", response_model=List[ClickSchemaOut])
 async def get(
     link_id: Optional[int] = None,
     session: Session = Depends(get_db_session),
