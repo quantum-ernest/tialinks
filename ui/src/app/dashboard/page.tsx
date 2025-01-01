@@ -129,7 +129,7 @@
 //
 
 import React from 'react';
-import {Layout, Row, Col, Card, Table, Typography, Statistic} from 'antd';
+import {Layout, Row, Col, Card, Table, Typography, Statistic, Flex} from 'antd';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     LineChart, Line, PieChart, Pie, Cell,
@@ -138,7 +138,11 @@ import {useDashboard} from "@/hooks/Dashboard";
 
 const {Header, Content} = Layout;
 const {Title, Text} = Typography;
-// const animatedClickIcon = require("../../../public/")
+import animatedClickIcon from "../../assets/icons/click-Animation.json";
+import animatedLinkIcon from "../../assets/icons/link-Animation.json";
+import animatedGraphIcon from "../../assets/icons/graph-Animation.json";
+import Lottie from "lottie-react";
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export default function Dashboard() {
@@ -173,16 +177,26 @@ export default function Dashboard() {
                             <Card>
                                 <Row gutter={16}>
                                     <Col span={8}>
-                                        <Statistic title="Total Links" value={dashboardData?.total_links}/>
+                                        <Statistic
+                                            title="Total Links"
+                                            prefix={<Lottie animationData={animatedLinkIcon} style={{height: '70px', width: '70px'}}/>}
+                                            value={dashboardData?.total_links}/>
                                     </Col>
                                     <Col span={8}>
-                                        <Statistic title="Total Clicks" value={dashboardData?.total_clicks}/>
+
+                                        <Statistic
+                                            title="Total Clicks"
+                                            value={dashboardData?.total_clicks}
+                                            prefix={<Lottie animationData={animatedClickIcon} style={{height: '70px', width: '70px'}}/>}
+                                        />
                                     </Col>
                                     <Col span={8}>
                                         <Statistic
                                             title="Average Clicks per Link"
                                             value={dashboardData?.average_clicks_per_link}
                                             precision={2}
+                                            prefix={<Lottie animationData={animatedGraphIcon} style={{height: '70px', width: '70px'}}/>}
+
                                         />
                                     </Col>
                                 </Row>
