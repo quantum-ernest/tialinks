@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react'
-import {notification} from 'antd'
+import {displayNotifications} from '../utils/notifications'
 
 export interface UtmParams {
     id: number
@@ -10,20 +10,10 @@ export interface UtmParams {
 }
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
-type NotificationType = 'success' | 'info' | 'warning' | 'error';
 export const useUtm = () => {
-
+    const {contextHolder,openNotification} = displayNotifications()
     const [utmList, setUtmList] = useState<UtmParams[]>([])
     const [loading, setLoading] = useState(true)
-
-    const [api, contextHolder] = notification.useNotification();
-
-    const openNotification = (type: NotificationType, message: string, description: string = '') => {
-        api[type]({
-            message: message,
-            description: description,
-        });
-    };
     const fetchUtmList = async () => {
         setLoading(true)
         try {
@@ -32,7 +22,7 @@ export const useUtm = () => {
                 throw new Error('No auth token found')
             }
 
-            const response = await fetch(apiUrl + '/api/utm', {
+            const response = await fetch(apiUrl + '/api/utms', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -60,7 +50,7 @@ export const useUtm = () => {
             if (!token) {
                 throw new Error('No auth token found')
             }
-            const response = await fetch(apiUrl + '/api/utm', {
+            const response = await fetch(apiUrl + '/api/utms', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -86,7 +76,7 @@ export const useUtm = () => {
             if (!token) {
                 throw new Error('No auth token found')
             }
-            const response = await fetch(apiUrl + `/api/utm/${id}`, {
+            const response = await fetch(apiUrl + `/api/utms/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
