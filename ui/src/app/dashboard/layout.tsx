@@ -1,61 +1,96 @@
 'use client'
 
-import { useState } from 'react'
-import { Layout, Menu } from 'antd'
+import {useState} from 'react'
+import {Layout, Menu, Input, Avatar, Typography} from 'antd'
 import {
-  BarChartOutlined,
-  LinkOutlined,
-  DashboardOutlined,
-  SettingOutlined,
-  TeamOutlined
+    DashboardOutlined,
+    BarChartOutlined,
+    SettingOutlined,
+    LinkOutlined,
+    UserOutlined,
 } from '@ant-design/icons'
 import Link from 'next/link'
+import {MdOutlineCampaign} from "react-icons/md";
 
-const { Header, Sider, Content } = Layout
+const {Header, Sider, Content} = Layout
+const {Search} = Input
+const {Text} = Typography
 
 export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
+                                            children,
+                                        }: {
+    children: React.ReactNode
 }) {
-  const [collapsed, setCollapsed] = useState(false)
+    const [collapsed, setCollapsed] = useState(false)
+    const user = localStorage.getItem('user')
 
-  return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
-        <div className="p-4">
-          <h1 className="text-white text-xl font-bold">TiaLinks</h1>
-        </div>
-        <Menu
-          theme="dark"
-          defaultSelectedKeys={['1']}
-          mode="inline"
-        >
-          <Menu.Item key="1" icon={<DashboardOutlined />}>
-            <Link href="/dashboard">Overview</Link>
-          </Menu.Item>
-          <Menu.Item key="2" icon={<LinkOutlined />}>
-            <Link href="/dashboard/links">Links</Link>
-          </Menu.Item>
-          <Menu.Item key="3" icon={<BarChartOutlined />}>
-            <Link href="/dashboard/analytics">Analytics</Link>
-          </Menu.Item>
-          <Menu.Item key="4" icon={<TeamOutlined />}>
-            <Link href="/dashboard/team">Team</Link>
-          </Menu.Item>
-          <Menu.Item key="5" icon={<SettingOutlined />}>
-            <Link href="/dashboard/settings">Settings</Link>
-          </Menu.Item>
-        </Menu>
-      </Sider>
-      <Layout>
-        <Header className="bg-white p-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Dashboard</h2>
-        </Header>
-        <Content className="m-4 p-4 bg-white rounded-lg">
-          {children}
-        </Content>
-      </Layout>
-    </Layout>
-  )
+    const userData = JSON.parse(user)
+
+    return (
+        <Layout style={{minHeight: '100vh'}}>
+            <Sider
+                collapsible
+                collapsed={collapsed}
+                onCollapse={(value) => setCollapsed(value)}
+                style={{background: '#fff'}}
+                width={250}
+            >
+                <div className="p-4">
+                    <Text strong className="text-xl text-purple-600">TiaLinks</Text>
+                </div>
+                <Menu
+                    theme="light"
+                    defaultSelectedKeys={['1']}
+                    mode="inline"
+                    items={[
+                        {
+                            key: '1',
+                            icon: <DashboardOutlined/>,
+                            label: <Link href="/dashboard">Dashboard</Link>,
+                        },
+                        {
+                            key: '2',
+                            icon: <LinkOutlined/>,
+                            label: <Link href="/dashboard/links">Links</Link>,
+                        },
+                        {
+                            key: '3',
+                            icon: <BarChartOutlined/>,
+                            label: <Link href="/dashboard/analytics">Analytics</Link>,
+                        }, {
+                            key: '4',
+                            icon: <MdOutlineCampaign/>,
+                            label: <Link href="/dashboard/campaigns">Campaigns</Link>,
+                        },
+                        {
+                            key: '5',
+                            icon: <SettingOutlined/>,
+                            label: <Link href="/dashboard/settings">Settings</Link>,
+                        },
+                    ]}
+                />
+            </Sider>
+            <Layout>
+                <Header style={{
+                    padding: '0 16px',
+                    background: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                }}>
+                    <Search
+                        placeholder="Search or paste URL"
+                        style={{width: 300, marginLeft: 20}}
+                    />
+                    <div style={{display: 'flex', alignItems: 'center'}}>
+                        <Avatar icon={<UserOutlined/>} style={{backgroundColor: '#7C3AED'}}/>
+                        <Text style={{marginLeft: 8}}>{userData? userData.name: userData.email}</Text>
+                    </div>
+                </Header>
+                <Content style={{margin: '24px 16px', padding: 24, background: '#fff', borderRadius: 8}}>
+                    {children}
+                </Content>
+            </Layout>
+        </Layout>
+    )
 }
