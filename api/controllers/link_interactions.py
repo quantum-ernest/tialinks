@@ -36,13 +36,13 @@ async def get_dashboard_summary(
         "top_referring_site": LinkInteractionMapper.get_top_referring_site(
             session=session, user_id=auth_user["user_id"]
         ),
-        "peak_click_month": LinkInteractionMapper.get_peak_click_month(
-            session=session, user_id=auth_user["user_id"]
-        ),
         "top_device": LinkInteractionMapper.get_top_devices(
             session=session, user_id=auth_user["user_id"]
         ),
         "top_country": LinkInteractionMapper.get_top_country(
+            session=session, user_id=auth_user["user_id"]
+        ),
+        "monthly_click_trend": LinkInteractionMapper.get_monthly_click_trend(
             session=session, user_id=auth_user["user_id"]
         ),
     }

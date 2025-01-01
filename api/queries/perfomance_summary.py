@@ -65,7 +65,7 @@ GROUP BY
     campaign
 ORDER BY
     click_count DESC
-LIMIT 1;
+LIMIT 5;
 """
 
 
@@ -80,7 +80,8 @@ WHERE
     AND domain IS NOT NULL
 GROUP BY
     domain
-LIMIT 1;
+ORDER BY domain
+LIMIT 5;
 """
 
 top_device = """
@@ -96,7 +97,7 @@ GROUP BY
     device
 ORDER BY
     click_count DESC
-LIMIT 1;
+LIMIT 5;
 """
 
 top_country = """
@@ -112,24 +113,37 @@ GROUP BY
     country
 ORDER BY
     click_count DESC
-LIMIT 1;
+LIMIT 5;
 """
 
-peak_click_month = """
+monthly_click_trend = """
 SELECT
-    date_trunc('month', created_at) AS peak_click_month,
+    date_trunc('month', created_at) AS month,
+    COUNT(*) AS monthly_clicks
+FROM
+    link_interaction
+WHERE
+    user_id = :user_id
+GROUP BY
+    month
+ORDER BY
+    month;
+"""
+
+month_most_clicks = """
+SELECT
+    date_trunc('month', created_at) AS month_most_clicks,
     COUNT(*) AS total_clicks
 FROM
     link_interaction
 WHERE
     user_id = :user_id
 GROUP BY
-    peak_click_month
+    month_most_clicks
 ORDER BY
     total_clicks DESC
 LIMIT 1;
 """
-
 
 # ------------------------------------
 
@@ -159,20 +173,6 @@ GROUP BY
     week
 ORDER BY
     week;
-"""
-
-monthly_click_trend = """
-SELECT
-    date_trunc('month', created_at) AS month,
-    COUNT(*) AS monthly_clicks
-FROM
-    link_interaction
-WHERE
-    user_id = :user_id
-GROUP BY
-    month
-ORDER BY
-    month;
 """
 
 

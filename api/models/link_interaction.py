@@ -49,7 +49,7 @@ class LinkInteractionMapper(Base):
         ).all()
         clicks_data = []
         for row in result:
-            clicks_data.append({"source": row[0], "click_count": row[1]})
+            clicks_data.append({"campaign": row[0], "click_count": row[1]})
         return clicks_data
 
     @classmethod
@@ -77,14 +77,6 @@ class LinkInteractionMapper(Base):
         return clicks_data
 
     @classmethod
-    def get_peak_click_month(cls, session: Session, user_id: int):
-        result = session.execute(text(peak_click_month), {"user_id": user_id}).all()
-        clicks_data = []
-        for row in result:
-            clicks_data.append({"month": row[0], "click_count": row[1]})
-        return clicks_data
-
-    @classmethod
     def get_total_clicks_per_day(cls, session: Session, user_id: int):
         result = session.execute(text(total_clicks_per_day), {"user_id": user_id}).all()
         clicks_data = []
@@ -105,6 +97,21 @@ class LinkInteractionMapper(Base):
                     "shortcode": row[1],
                     "link_id": row[2],
                     "clicks": row[3],
+                }
+            )
+        return clicks_data
+
+    @classmethod
+    def get_monthly_click_trend(cls, session: Session, user_id: int):
+        result = session.execute(
+            text(monthly_click_trend), {"user_id": user_id}
+        ).fetchall()
+        clicks_data = []
+        for row in result:
+            clicks_data.append(
+                {
+                    "month": row[0],
+                    "click_count": row[1],
                 }
             )
         return clicks_data
