@@ -205,33 +205,6 @@ export default function Dashboard() {
                     </Row>
 
                     <Row gutter={[16, 16]} style={{marginTop: '20px'}}>
-                        {/*<Col span={8}>*/}
-                        {/*  <Card>*/}
-                        {/*    <Title level={4}>Overall Link Performance</Title>*/}
-                        {/*    <Title level={2}>{dashboardData?.total_clicks.toLocaleString()}</Title>*/}
-                        {/*    <Text>Total Clicks</Text>*/}
-                        {/*    <br />*/}
-                        {/*    <Text strong>{dashboardData.uniqueClicks.toLocaleString()} Unique Clicks</Text>*/}
-                        {/*  </Card>*/}
-                        {/*</Col>*/}
-                        {/*<Col span={16}>*/}
-                        {/*  <Card>*/}
-                        {/*    <Title level={4}>Average Clicks per Link</Title>*/}
-                        {/*    <ResponsiveContainer width="100%" height={200}>*/}
-                        {/*      <BarChart data={dashboardData?.top_performing_links}>*/}
-                        {/*        <CartesianGrid strokeDasharray="3 3" />*/}
-                        {/*        <XAxis dataKey="period" />*/}
-                        {/*        <YAxis />*/}
-                        {/*        <Tooltip />*/}
-                        {/*        <Legend />*/}
-                        {/*        <Bar dataKey="click_count" fill="#8884d8" />*/}
-                        {/*      </BarChart>*/}
-                        {/*    </ResponsiveContainer>*/}
-                        {/*  </Card>*/}
-                        {/*</Col>*/}
-                    </Row>
-
-                    <Row gutter={[16, 16]} style={{marginTop: '20px'}}>
                         <Col span={12}>
                             <Card>
                                 <Title level={4}>Top Performing Links</Title>
