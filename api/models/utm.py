@@ -1,7 +1,7 @@
 from sqlalchemy.util import hybridproperty
 
 from models import Base
-from sqlalchemy import ForeignKey, select, UniqueConstraint
+from sqlalchemy import ForeignKey, select, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 from typing import Optional, List
 
@@ -19,6 +19,12 @@ class UtmMapper(Base):
     @hybridproperty
     def link_count(self) -> int:
         return len(self.link)
+
+    @classmethod
+    def get_total_records(cls, session: Session, user_id: int) -> int:
+        return session.scalars(
+            select(func.count(cls.id).where(cls.user_id == user_id))
+        ).first()
 
     @classmethod
     def get_by_id(cls, session: Session, pk_id: int, **kwargs):
