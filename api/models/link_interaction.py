@@ -1,8 +1,7 @@
 from typing import Optional
 from datetime import datetime
 from queries import *  # noqa: F403
-from sqlalchemy import PrimaryKeyConstraint, text
-
+from sqlalchemy import PrimaryKeyConstraint, text, select, func, cast, Date
 from models import Base
 from sqlalchemy.orm import Mapped, mapped_column, Session
 
@@ -30,59 +29,122 @@ class LinkInteractionMapper(Base):
 
     @classmethod
     def get_total_clicks(cls, session: Session, user_id: int):
-        return session.scalars(text(total_clicks), {"user_id": user_id}).first()
+        return session.execute(
+            select(func.count(cls.id)).where(cls.user_id == user_id)
+        ).scalar_one()
 
     @classmethod
     def get_top_performing_links(cls, session: Session, user_id: int):
-        result = session.execute(text(top_performing_links), {"user_id": user_id}).all()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {"link_id": row[0], "shortcode": row[1], "click_count": row[2]}
-            )
-        return clicks_data
+        records = session.execute(
+            select(cls.link_id, cls.shortcode, func.count().label("click_count"))
+            .where(cls.user_id == user_id)
+            .group_by(cls.link_id, cls.shortcode)
+            .order_by(func.count().desc())
+        ).all()
+        return [
+            {
+                "link_id": row.link_id,
+                "shortcode": row.shortcode,
+                "click_count": row.click_count,
+            }
+            for row in records
+        ]
+
+    @classmethod
+    def get_total_clicks_per_day(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ):
+        query = select(
+            cast(cls.created_at, Date).label("date"), func.count().label("click_count")
+        ).where(cls.user_id == user_id)
+        if start_date:
+            query = query.where(cls.created_at >= start_date)
+        if end_date:
+            query = query.where(cls.created_at <= end_date)
+        query = query.group_by(cast(cls.created_at, Date)).order_by(
+            cast(cls.created_at, Date)
+        )
+        records = session.execute(query).all()
+        return [{"date": row.date, "click_count": row.click_count} for row in records]
 
     @classmethod
     def get_top_referring_campaign(cls, session: Session, user_id: int):
-        result = session.execute(
-            text(top_referring_campaign), {"user_id": user_id}
-        ).all()
-        clicks_data = []
-        for row in result:
-            clicks_data.append({"campaign": row[0], "click_count": row[1]})
-        return clicks_data
+        query = (
+            select(cls.campaign, func.count().label("click_count"))
+            .where(cls.user_id == user_id)
+            .group_by(cls.campaign)
+            .order_by(func.count().desc())
+        )
+        records = session.execute(query).all()
+        return [
+            {"campaign": row.campaign, "click_count": row.click_count}
+            for row in records
+        ]
 
     @classmethod
     def get_top_referring_site(cls, session: Session, user_id: int):
-        result = session.execute(text(top_referring_site), {"user_id": user_id}).all()
-        clicks_data = []
-        for row in result:
-            clicks_data.append({"domain": row[0], "click_count": row[1]})
-        return clicks_data
+        query = (
+            select(cls.domain, func.count().label("click_count"))
+            .where(cls.user_id == user_id)
+            .group_by(cls.domain)
+            .order_by(func.count().desc())
+        )
+        result = session.execute(query).all()
+        return [
+            {"domain": row.domain, "click_count": row.click_count} for row in result
+        ]
 
     @classmethod
     def get_top_devices(cls, session: Session, user_id: int):
-        result = session.execute(text(top_device), {"user_id": user_id}).all()
-        clicks_data = []
-        for row in result:
-            clicks_data.append({"device": row[0], "click_count": row[1]})
-        return clicks_data
+        query = (
+            select(cls.device, func.count().label("click_count"))
+            .where(cls.user_id == user_id)
+            .group_by(cls.device)
+            .order_by(func.count().desc())
+        )
+        result = session.execute(query).all()
+        return [
+            {"device": row.device, "click_count": row.click_count} for row in result
+        ]
 
     @classmethod
     def get_top_country(cls, session: Session, user_id: int):
-        result = session.execute(text(top_country), {"user_id": user_id}).all()
-        clicks_data = []
-        for row in result:
-            clicks_data.append({"country": row[0], "click_count": row[1]})
-        return clicks_data
+        query = (
+            select(cls.country, func.count().label("click_count"))
+            .where(cls.user_id == user_id)
+            .group_by(cls.country)
+            .order_by(func.count().desc())
+        )
+        result = session.execute(query).all()
+        return [
+            {"country": row.country, "click_count": row.click_count} for row in result
+        ]
 
     @classmethod
-    def get_total_clicks_per_day(cls, session: Session, user_id: int):
-        result = session.execute(text(total_clicks_per_day), {"user_id": user_id}).all()
-        clicks_data = []
-        for row in result:
-            clicks_data.append({"day": row[0], "year": row[1], "click_count": row[2]})
-        return clicks_data
+    def get_monthly_click_trend(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+    ):
+        query = select(
+            func.date_trunc("month", cls.created_at).label("month"),
+            func.count().label("click_count"),
+        ).where(cls.user_id == user_id)
+        if start_date:
+            query = query.where(cls.created_at >= start_date)
+        if end_date:
+            query = query.where(cls.created_at <= end_date)
+        query = query.group_by(func.date_trunc("month", cls.created_at)).order_by(
+            func.date_trunc("month", cls.created_at)
+        )
+        records = session.execute(query).all()
+        return [{"month": row.month, "click_count": row.click_count} for row in records]
 
     @classmethod
     def get_clicks_trend_by_day(cls, session: Session, user_id: int):
@@ -97,21 +159,6 @@ class LinkInteractionMapper(Base):
                     "shortcode": row[1],
                     "link_id": row[2],
                     "clicks": row[3],
-                }
-            )
-        return clicks_data
-
-    @classmethod
-    def get_monthly_click_trend(cls, session: Session, user_id: int):
-        result = session.execute(
-            text(monthly_click_trend), {"user_id": user_id}
-        ).fetchall()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {
-                    "month": row[0],
-                    "click_count": row[1],
                 }
             )
         return clicks_data
