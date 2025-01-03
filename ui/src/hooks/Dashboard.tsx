@@ -38,7 +38,7 @@ const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 export const useDashboard = () => {
     const {contextHolder, openNotification} = displayNotifications();
     const [loading, setLoading] = useState(false)
-    const [dashboardData, setDashboardData] = useState<DashboardPrams>()
+    const [dashboardData, setDashboardData] = useState<DashboardPrams[]|null>(null)
 
     const fetchData = async () => {
         try {
@@ -47,14 +47,14 @@ export const useDashboard = () => {
             if (!token) {
                 openNotification("error", "No access token provided")
             }
-            const response = await fetch(apiUrl + '/api/analysis/dashboard/summary', {
+            const response = await fetch(apiUrl + '/api/analytics/dashboard', {
                 method: 'GET',
                 headers: {'Authorization': `Bearer ${token}`},
             })
             if (!response.ok) {
                 throw new Error(response.statusText)
             }
-            const data = await response.json()
+            const data: DashboardPrams[] = await response.json()
             setDashboardData(data)
             setLoading(false)
         } catch (error) {
