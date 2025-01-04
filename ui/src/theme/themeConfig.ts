@@ -1,25 +1,35 @@
-import type { ThemeConfig } from 'antd'
+import type {ThemeConfig} from 'antd'
 
 const themeConfig: ThemeConfig = {
-  token: {
-    colorPrimary: '#7C3AED',
-    colorLink: '#7C3AED',
-    borderRadius: 8,
-    fontFamily: 'Inter, sans-serif',
-  },
-  components: {
-    Button: {
-      borderRadius: 8,
-      controlHeight: 40,
+    token: {
+        colorPrimary: '#7C3AED',
+        colorLink: '#7C3AED',
+        borderRadius: 8,
+        fontFamily: 'Inter, sans-serif',
     },
-    Input: {
-      borderRadius: 8,
-      controlHeight: 50,
+    components: {
+        Button: {
+            borderRadius: 8,
+            controlHeight: 40,
+        },
+        Input: {
+            borderRadius: 8,
+            controlHeight: 50,
+        },
+        Menu: {
+            itemSelectedColor: '#7C3AED',
+        },
+        Layout: {
+            bodyBg: '#f0f2f5',
+            headerBg: '#fff',
+            siderBg: '#fff',
+        },
+        Card: {
+            borderRadius: 12,
+            colorBgContainer: '#fff',
+
+        },
     },
-    Card: {
-      borderRadius: 12,
-    },
-  },
 }
 
 export default themeConfig
