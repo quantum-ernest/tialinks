@@ -9,10 +9,16 @@ class LinkSchemaIn(BaseModel):
     original_url: AnyUrl
 
 
+class LinkSchemaUpdate(BaseModel):
+    utm_id: Optional[int] = None
+    expires_at: Optional[datetime] = None
+
+
 class LinkSchemaOut(LinkSchemaIn):
     shortcode: str
     count: int
     utm: Optional[UtmLinkSchemaOut] = None
+    expires_at: Optional[datetime] = None
     user: UserSchemaOut
     created_at: datetime
     id: int
