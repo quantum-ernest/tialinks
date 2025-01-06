@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from models import Base
 from sqlalchemy import ForeignKey, select, func
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
@@ -36,10 +38,19 @@ class LinkMapper(Base):
         return True if record else False
 
     @classmethod
-    def get_total_links(cls, session: Session, user_id: int):
-        return session.scalars(
-            select(func.count(cls.id)).where(cls.user_id == user_id)
-        ).first()
+    def get_total_links(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime = None,
+        end_date: datetime = None,
+    ):
+        query = select(func.count(cls.id)).where(cls.user_id == user_id)
+        if start_date:
+            query = query.where(cls.created_at >= start_date)
+        if end_date:
+            query = query.where(cls.created_at <= end_date)
+        return session.scalars(query).first()
 
     @classmethod
     def get_qrcode(cls, session: Session, filename: str, user_id: int):
