@@ -12,7 +12,6 @@ class LinkSchemaIn(BaseModel):
 class LinkSchemaOut(LinkSchemaIn):
     shortcode: str
     count: int
-    qrcode: Optional[str] = None
     utm: Optional[UtmLinkSchemaOut] = None
     user: UserSchemaOut
     created_at: datetime

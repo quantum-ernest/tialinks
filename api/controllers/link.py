@@ -1,13 +1,10 @@
-import os
-
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from core import get_db_session, env
+from core import get_db_session
 from typing import List
 from models import LinkMapper, UtmMapper
 from schemas import LinkSchemaOut, LinkSchemaIn
-from services import IsAuthenticated, generate_qr_codes
+from services import IsAuthenticated
 from utils import generate_readable_short_code, extract_utm_data
 
 router = APIRouter(prefix="/api/links", tags=["LINK"])
@@ -58,36 +55,12 @@ async def create(
             },
         )
 
-    qrcode = generate_qr_codes(f"{env.BASE_URL}/{shortcode}")
-
     data.update(
         {
             "original_url": original_url,
             "shortcode": shortcode,
-            "qrcode": qrcode,
             "utm_id": utm.id if utm else None,
             "user_id": auth_user.get("user_id"),
         }
     )
     return LinkMapper.create(session=session, data=data)
-
-
-@router.get("/qrcode/{filename}")
-async def get_qrcode(
-    filename: str,
-    session: Session = Depends(get_db_session),
-    auth_user: dict = Depends(IsAuthenticated()),
-):
-    qrcode = LinkMapper.get_qrcode(
-        session=session, filename=filename, user_id=auth_user.get("user_id")
-    )
-    if not qrcode:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
-        )
-    file_path = f"assets/images/{filename}"
-    if not os.path.exists(file_path):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Image not found"
-        )
-    return FileResponse(file_path)

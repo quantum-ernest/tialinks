@@ -10,7 +10,6 @@ class LinkMapper(Base):
     original_url: Mapped[str]
     shortcode: Mapped[str] = mapped_column(unique=True)
     count: Mapped[int] = mapped_column(default=0)
-    qrcode: Mapped[Optional[str]]
     utm_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("utm.id", ondelete="SET NULL")
     )
@@ -51,9 +50,3 @@ class LinkMapper(Base):
         if end_date:
             query = query.where(cls.created_at <= end_date)
         return session.scalars(query).first()
-
-    @classmethod
-    def get_qrcode(cls, session: Session, filename: str, user_id: int):
-        return session.scalars(
-            select(cls.qrcode).where(cls.user_id == user_id, cls.qrcode == filename)
-        )
