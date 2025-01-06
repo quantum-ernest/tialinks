@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
-from queries import *  # noqa: F403
-from sqlalchemy import PrimaryKeyConstraint, text, select, func, cast, Date
+from sqlalchemy import PrimaryKeyConstraint, select, func, cast, Date
+from sqlalchemy.sql import Select
 from models import Base
 from sqlalchemy.orm import Mapped, mapped_column, Session
 
@@ -28,27 +28,64 @@ class LinkInteractionMapper(Base):
     __table_args__ = (PrimaryKeyConstraint("id", "created_at"),)
 
     @classmethod
-    def get_total_clicks(cls, session: Session, user_id: int):
-        return session.execute(
-            select(func.count(cls.id)).where(cls.user_id == user_id)
-        ).scalar_one()
+    def _build_where_clause(
+        cls,
+        query: Select,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ) -> Select:
+        query = query.where(cls.user_id == user_id)
+        if link_id:
+            query = query.where(cls.link_id == link_id)
+        if start_date:
+            query = query.where(cls.created_at >= start_date)
+        if end_date:
+            query = query.where(cls.created_at <= end_date)
+        return query
 
     @classmethod
-    def get_top_performing_links(cls, session: Session, user_id: int):
-        records = session.execute(
-            select(cls.link_id, cls.shortcode, func.count().label("click_count"))
-            .where(cls.user_id == user_id)
-            .group_by(cls.link_id, cls.shortcode)
-            .order_by(func.count().desc())
-        ).all()
-        return [
-            {
-                "link_id": row.link_id,
-                "shortcode": row.shortcode,
-                "click_count": row.click_count,
-            }
-            for row in records
-        ]
+    def _base_group_by_clause(cls, query: Select) -> Select:
+        query = query.order_by(func.count().desc())
+        return query
+
+    @classmethod
+    def _execute_query(cls, session: Session, query: Select) -> List[dict]:
+        return [dict(row._mapping) for row in session.execute(query).all()]
+
+    @classmethod
+    def get_total_clicks(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(func.count(cls.id))
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        return session.execute(query).scalar_one()
+
+    @classmethod
+    def get_top_performing_links(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(
+            cls.link_id,
+            cls.shortcode,
+            cls.original_url,
+            cls.campaign,
+            func.count().label("click_count"),
+        ).group_by(cls.link_id, cls.shortcode, cls.original_url, cls.campaign)
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
 
     @classmethod
     def get_total_clicks_per_day(
@@ -57,72 +94,201 @@ class LinkInteractionMapper(Base):
         user_id: int,
         start_date: datetime | None = None,
         end_date: datetime | None = None,
+        link_id: int | None = None,
     ):
         query = select(
             cast(cls.created_at, Date).label("date"), func.count().label("click_count")
-        ).where(cls.user_id == user_id)
-        if start_date:
-            query = query.where(cls.created_at >= start_date)
-        if end_date:
-            query = query.where(cls.created_at <= end_date)
+        )
         query = query.group_by(cast(cls.created_at, Date)).order_by(
             cast(cls.created_at, Date)
         )
-        records = session.execute(query).all()
-        return [{"date": row.date, "click_count": row.click_count} for row in records]
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        return cls._execute_query(session, query)
 
     @classmethod
-    def get_top_referring_campaign(cls, session: Session, user_id: int):
-        query = (
-            select(cls.campaign, func.count().label("click_count"))
-            .where(cls.user_id == user_id)
-            .group_by(cls.campaign)
-            .order_by(func.count().desc())
+    def get_top_referring_campaign(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(cls.campaign, func.count().label("click_count")).group_by(
+            cls.campaign
         )
-        records = session.execute(query).all()
-        return [
-            {"campaign": row.campaign, "click_count": row.click_count}
-            for row in records
-        ]
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
 
     @classmethod
-    def get_top_referring_site(cls, session: Session, user_id: int):
-        query = (
-            select(cls.domain, func.count().label("click_count"))
-            .where(cls.user_id == user_id)
-            .group_by(cls.domain)
-            .order_by(func.count().desc())
+    def get_top_referring_site(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(cls.domain, func.count().label("click_count")).group_by(
+            cls.domain
         )
-        result = session.execute(query).all()
-        return [
-            {"domain": row.domain, "click_count": row.click_count} for row in result
-        ]
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
 
     @classmethod
-    def get_top_devices(cls, session: Session, user_id: int):
-        query = (
-            select(cls.device, func.count().label("click_count"))
-            .where(cls.user_id == user_id)
-            .group_by(cls.device)
-            .order_by(func.count().desc())
+    def get_top_devices(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(cls.device, func.count().label("click_count")).group_by(
+            cls.device
         )
-        result = session.execute(query).all()
-        return [
-            {"device": row.device, "click_count": row.click_count} for row in result
-        ]
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
 
     @classmethod
-    def get_top_country(cls, session: Session, user_id: int):
-        query = (
-            select(cls.country, func.count().label("click_count"))
-            .where(cls.user_id == user_id)
-            .group_by(cls.country)
-            .order_by(func.count().desc())
+    def get_top_browsers(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(cls.browser, func.count().label("click_count")).group_by(
+            cls.browser
         )
-        result = session.execute(query).all()
-        return [
-            {"country": row.country, "click_count": row.click_count} for row in result
-        ]
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
+
+    @classmethod
+    def get_top_operating_systems(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(
+            cls.operating_system, func.count().label("click_count")
+        ).group_by(cls.operating_system)
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
+
+    @classmethod
+    def get_geographical_data(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        return {
+            "geo_summary": cls.get_geo_summary_data(
+                session, user_id, start_date, end_date, link_id
+            ),
+            "continents": cls.get_continents(
+                session, user_id, start_date, end_date, link_id
+            ),
+            "countries": cls.get_countries(
+                session, user_id, start_date, end_date, link_id
+            ),
+            "regions": cls.get_regions(session, user_id, start_date, end_date, link_id),
+            "cities": cls.get_cities(session, user_id, start_date, end_date, link_id),
+        }
+
+    @classmethod
+    def get_geo_summary_data(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(
+            cls.continent,
+            cls.country,
+            cls.region,
+            func.coalesce(cls.city, "Unknown City").label("city"),
+            func.count().label("click_count"),
+        ).group_by(cls.continent, cls.country, cls.region, cls.city)
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
+
+    @classmethod
+    def get_continents(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(cls.continent, func.count().label("click_count")).group_by(
+            cls.continent
+        )
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
+
+    @classmethod
+    def get_countries(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(cls.country, func.count().label("click_count")).group_by(
+            cls.country
+        )
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
+
+    @classmethod
+    def get_regions(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(cls.region, func.count().label("click_count")).group_by(
+            cls.region
+        )
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
+
+    @classmethod
+    def get_cities(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(cls.city, func.count().label("click_count")).group_by(cls.city)
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        query = cls._base_group_by_clause(query)
+        return cls._execute_query(session, query)
 
     @classmethod
     def get_monthly_click_trend(
@@ -131,135 +297,14 @@ class LinkInteractionMapper(Base):
         user_id: int,
         start_date: datetime | None = None,
         end_date: datetime | None = None,
+        link_id: int | None = None,
     ):
         query = select(
             func.date_trunc("month", cls.created_at).label("month"),
             func.count().label("click_count"),
-        ).where(cls.user_id == user_id)
-        if start_date:
-            query = query.where(cls.created_at >= start_date)
-        if end_date:
-            query = query.where(cls.created_at <= end_date)
+        )
         query = query.group_by(func.date_trunc("month", cls.created_at)).order_by(
             func.date_trunc("month", cls.created_at)
         )
-        records = session.execute(query).all()
-        return [{"month": row.month, "click_count": row.click_count} for row in records]
-
-    @classmethod
-    def get_clicks_trend_by_day(cls, session: Session, user_id: int):
-        result = session.execute(
-            text(clicks_trend_by_day), {"user_id": user_id}
-        ).fetchall()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {
-                    "date": row[0],
-                    "shortcode": row[1],
-                    "link_id": row[2],
-                    "clicks": row[3],
-                }
-            )
-        return clicks_data
-
-    @classmethod
-    def get_clicks_by_continent(cls, session: Session, user_id: int):
-        result = session.execute(
-            text(clicks_by_continent), {"user_id": user_id}
-        ).fetchall()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {
-                    "continent": row[0],
-                    "shortcode": row[1],
-                    "link_id": row[2],
-                    "clicks": row[3],
-                }
-            )
-        return clicks_data
-
-    @classmethod
-    def get_clicks_by_country(cls, session: Session, user_id: int):
-        result = session.execute(
-            text(clicks_by_country), {"user_id": user_id}
-        ).fetchall()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {
-                    "country": row[0],
-                    "shortcode": row[1],
-                    "link_id": row[2],
-                    "clicks": row[3],
-                }
-            )
-        return clicks_data
-
-    @classmethod
-    def get_clicks_by_region(cls, session: Session, user_id: int):
-        result = session.execute(
-            text(clicks_by_region), {"user_id": user_id}
-        ).fetchall()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {
-                    "region": row[0],
-                    "shortcode": row[1],
-                    "link_id": row[2],
-                    "clicks": row[3],
-                }
-            )
-        return clicks_data
-
-    @classmethod
-    def get_clicks_by_city(cls, session: Session, user_id: int):
-        result = session.execute(text(clicks_by_city), {"user_id": user_id}).fetchall()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {
-                    "city": row[0],
-                    "shortcode": row[1],
-                    "link_id": row[2],
-                    "clicks": row[3],
-                }
-            )
-        return clicks_data
-
-    @classmethod
-    def get_clicks_by_country_city(cls, session: Session, user_id: int):
-        result = session.execute(
-            text(clicks_by_country_city), {"user_id": user_id}
-        ).fetchall()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {
-                    "country": row[0],
-                    "city": row[1],
-                    "shortcode": row[2],
-                    "link_id": row[3],
-                    "clicks": row[4],
-                }
-            )
-        return clicks_data
-
-    @classmethod
-    def top_countries_for_shortcodes(cls, session: Session, user_id: int):
-        result = session.execute(
-            text(top_countries_for_shortcodes), {"user_id": user_id}
-        ).fetchall()
-        clicks_data = []
-        for row in result:
-            clicks_data.append(
-                {
-                    "country": row[0],
-                    "shortcode": row[1],
-                    "link_id": row[2],
-                    "clicks": row[3],
-                }
-            )
-        return clicks_data
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        return cls._execute_query(session, query)
