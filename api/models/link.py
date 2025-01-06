@@ -10,6 +10,7 @@ class LinkMapper(Base):
     original_url: Mapped[str]
     shortcode: Mapped[str] = mapped_column(unique=True)
     count: Mapped[int] = mapped_column(default=0)
+    expires_at: Mapped[Optional[datetime]]
     utm_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("utm.id", ondelete="SET NULL")
     )
@@ -20,6 +21,13 @@ class LinkMapper(Base):
     user: Mapped["UserMapper"] = relationship(back_populates="link")
     click: Mapped["ClickMapper"] = relationship(back_populates="link")
     utm: Mapped["UtmMapper"] = relationship(back_populates="link")
+
+    @classmethod
+    def get_by_id(cls, session: Session, pk_id: int, **kwargs):
+        user_id = kwargs.get("user_id")
+        return session.scalars(
+            select(cls).where(cls.id == pk_id, cls.user_id == user_id)
+        ).first()
 
     @classmethod
     def get_all(cls, session: Session, user_id: int):
