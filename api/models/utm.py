@@ -1,20 +1,20 @@
 from sqlalchemy.util import hybridproperty
 
 from models import Base
-from sqlalchemy import ForeignKey, select, UniqueConstraint, func
+from sqlalchemy import ForeignKey, select, func, insert
 from sqlalchemy.orm import Mapped, mapped_column, Session, relationship
 from typing import Optional, List
+
+from utils import extract_utm_data
 
 
 class UtmMapper(Base):
     campaign: Mapped[str]
-    source: Mapped[str]
+    source: Mapped[Optional[str]]
     medium: Mapped[Optional[str]]
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
     user: Mapped["UserMapper"] = relationship(back_populates="utm")
     link: Mapped[List["LinkMapper"]] = relationship(back_populates="utm")
-
-    __table_args__ = (UniqueConstraint("campaign", "source", "user_id"),)
 
     @hybridproperty
     def link_count(self) -> int:
@@ -34,12 +34,19 @@ class UtmMapper(Base):
         ).first()
 
     @classmethod
-    def validate_utm(
-        cls, session: Session, campaign: str, source: str, medium: str, user_id: int
-    ):
-        query = select(cls).where(
-            cls.campaign == campaign, cls.source == source, cls.user_id == user_id
+    def create_from_link(cls, session: Session, **kwargs):
+        data = kwargs.get("data")
+        utm_data = extract_utm_data(data)
+        record = session.scalars(
+            select(cls).filter_by(
+                user_id=utm_data["user_id"],
+                campaign=utm_data["campaign"],
+                source=utm_data["source"],
+                medium=utm_data["medium"],
+            )
+        ).first()
+        return (
+            record
+            if record
+            else session.scalars(insert(cls).returning(cls), utm_data).first()
         )
-        if medium:
-            query = query.where(cls.medium == medium)
-        return session.scalars(query).first()
