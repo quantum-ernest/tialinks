@@ -34,10 +34,12 @@ class UtmMapper(Base):
         ).first()
 
     @classmethod
-    def validate_utm(cls, session: Session, campaign: str, source: str, user_id: int):
-        record = session.scalars(
-            select(cls).where(
-                cls.campaign == campaign, cls.source == source, cls.user_id == user_id
-            )
-        ).first()
-        return True if record else False
+    def validate_utm(
+        cls, session: Session, campaign: str, source: str, medium: str, user_id: int
+    ):
+        query = select(cls).where(
+            cls.campaign == campaign, cls.source == source, cls.user_id == user_id
+        )
+        if medium:
+            query = query.where(cls.medium == medium)
+        return session.scalars(query).first()
