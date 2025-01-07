@@ -20,7 +20,6 @@ class LinkInteractionMapper(Base):
     operating_system: Mapped[Optional[str]] = mapped_column(index=True)
     device: Mapped[Optional[str]] = mapped_column(index=True)
     domain: Mapped[Optional[str]] = mapped_column(index=True)
-    path: Mapped[Optional[str]] = mapped_column(index=True)
     continent: Mapped[Optional[str]] = mapped_column(index=True)
     country: Mapped[Optional[str]] = mapped_column(index=True)
     region: Mapped[Optional[str]] = mapped_column(index=True)
