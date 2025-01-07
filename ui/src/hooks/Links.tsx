@@ -42,6 +42,7 @@ export const useLinks = () => {
             }))
             setLinkData(formattedData)
         } catch (error) {
+            // @ts-ignore
             openNotification('error', "Unable to fetch links.", error.message)
         } finally {
             setLoading(false)
@@ -63,10 +64,11 @@ export const useLinks = () => {
                 throw new Error(response.statusText)
             }
             const newLink: LinkParams = await response.json()
-            setLinkData((prevData) => (prevData ? [newLink, ...prevData ] : [newLink]));
+            setLinkData((prevData) => (prevData ? [newLink, ...prevData] : [newLink]));
         } catch (error) {
+            // @ts-ignore
             openNotification('error', "Unable to create links.", error.message)
-        }finally {
+        } finally {
             setLoading(false)
         }
     }
