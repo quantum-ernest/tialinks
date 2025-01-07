@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 import redis
 from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
@@ -27,9 +29,7 @@ class AuthService:
     @classmethod
     def get_access_token(cls, user) -> dict:
         token = cls.create_access_token(
-            data={
-                "user_id": user.id,
-            }
+            data={"user_id": user.id, "exp": datetime.now() + timedelta(weeks=4)}
         )
         return {"token": token, "user": user}
 
