@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from core import get_db_session
+from core import get_db_session, env
 from typing import List
 from models import LinkMapper, UtmMapper
 from schemas import LinkSchemaOut, LinkSchemaIn, LinkSchemaUpdate
@@ -54,10 +54,13 @@ async def create(
                 "user_id": auth_user.get("user_id"),
             },
         )
-
+    base_url = (
+        env.BASE_URL
+    )  # Todo: implement user configured url or default url(BASE_URL)
     data.update(
         {
             "original_url": original_url,
+            "generated_url": base_url + "/" + shortcode,
             "shortcode": shortcode,
             "utm_id": utm.id if utm else None,
             "user_id": auth_user.get("user_id"),
