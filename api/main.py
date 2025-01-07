@@ -9,6 +9,18 @@ from controllers import (
 )
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+
+
+from core import engine
+from models import Base
+
+limiter = Limiter(key_func=get_remote_address, default_limits=["45/minutes"])
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="TiaLinks API",
@@ -17,6 +29,11 @@ app = FastAPI(
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
 
 app.add_middleware(
     CORSMiddleware,
