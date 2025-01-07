@@ -59,3 +59,8 @@ class LinkMapper(Base):
         if end_date:
             query = query.where(cls.created_at <= end_date)
         return session.scalars(query).first()
+
+    def increment_count(self, session: Session):
+        self.count += 1
+        session.commit()
+        return
