@@ -26,11 +26,11 @@ async def redirect(
     request: Request,
     session: Session = Depends(get_db_session),
 ):
-    link = LinkMapper.get_by_shortcode(session=session, shortcode=shortcode)
+    link = LinkMapper.get_by_shortcode(session, shortcode)
     if not link:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"TiaLinks: Unable to locate short url /{shortcode}",
+            detail=f"TiaLinks: Unable to locate shortcode /{shortcode}",
         )
     if link.expires_at < datetime.now():
         raise HTTPException(
@@ -47,7 +47,7 @@ async def redirect(
     ip_address = request.client.host
     location = (
         LocationMapper.create(session=session, ip_address=ip_address)
-        if user_agent_data
+        if ip_address
         else None
     )
 
@@ -65,8 +65,7 @@ async def redirect(
         "referer_id": referer.id if referer else None,
     }
     click = ClickMapper.create(session=session, data=click_obj)
-    link.count += 1
-    session.commit()
+    link.increment_count(session)
     utm = (
         UtmMapper.get_by_id(session=session, pk_id=link.utm_id, user_id=link.user_id)
         if link.utm_id
@@ -78,18 +77,17 @@ async def redirect(
         "shortcode": shortcode,
         "original_url": link.original_url,
         "generated_url": link.generated_url,
-        "campaign": utm.campaign if utm else "other",
-        "source": utm.source if utm else None,
-        "medium": utm.medium if utm else None,
-        "browser": user_agent.browser if user_agent else None,
-        "operating_system": user_agent.operating_system if user_agent else None,
-        "device": user_agent.device if user_agent else None,
-        "domain": referer.domain if referer else "other",
-        "path": referer.path if referer else None,
-        "continent": location.continent if location else None,
-        "country": location.country if location else None,
-        "region": location.region if location else None,
-        "city": location.city if location else None,
+        "campaign": utm.campaign,
+        "source": utm.source,
+        "medium": utm.medium,
+        "browser": user_agent.browser,
+        "operating_system": user_agent.operating_system,
+        "device": user_agent.device,
+        "domain": referer.domain,
+        "continent": location.continent,
+        "country": location.country,
+        "region": location.region,
+        "city": location.city,
         "user_id": link.user_id,
     }
     LinkInteractionMapper.create(session=session, data=link_interaction)
