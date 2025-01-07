@@ -8,7 +8,7 @@ from schemas import UserSchemaOut
 
 class UtmSchema(BaseModel):
     campaign: str
-    source: str
+    source: Optional[str] = None
     medium: Optional[str] = None
 
 
