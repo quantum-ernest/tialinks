@@ -77,6 +77,7 @@ async def redirect(
         "link_id": link.id,
         "shortcode": shortcode,
         "original_url": link.original_url,
+        "generated_url": link.generated_url,
         "campaign": utm.campaign if utm else "other",
         "source": utm.source if utm else None,
         "medium": utm.medium if utm else None,
