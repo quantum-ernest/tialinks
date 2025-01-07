@@ -24,36 +24,34 @@ def extract_user_agent(value: str) -> dict:
     user_agent = parse(value)
     data = {
         "user_agent": value,
-        "operating_system": user_agent.os.family if user_agent.os.family else None,
-        "browser": user_agent.browser.family if user_agent.browser.family else None,
-        "device": user_agent.device.family if user_agent.device.family else None,
+        "operating_system": getattr(user_agent.os, "family", None) or "Unknown",
+        "browser": getattr(user_agent.browser, "family", None) or "Unknown",
+        "device": getattr(user_agent.device, "family", None) or "Unknown",
     }
-    return {k: v for k, v in data.items() if v}
+    return data
 
 
 def extract_referer(value: str) -> dict:
     referer = urlparse(value)
     data = {
         "full_url": value,
-        "domain": referer.netloc if referer.netloc else None,
-        "path": referer.path if referer.path else None,
+        "domain": getattr(referer, "netloc", None) or "Unknown",
     }
-    return {k: v for k, v in data.items() if v}
+    return data
 
 
 def extract_location(value: str) -> dict:
     try:
         url = f"http://ip-api.com/json/{value}?fields=status,message,continent,country,regionName,city"
         response = requests.get(url)
-        if response.json().get("status") == "success":
-            data = response.json()
-            data = {
-                "continent": data.get("continent"),
-                "country": data.get("country"),
-                "region": data.get("regionName"),
-                "city": data.get("city"),
-            }
-            return data
+        data = response.json()
+        data = {
+            "continent": data.get("continent") or "Unknown",
+            "country": data.get("country") or "Unknown",
+            "region": data.get("regionName") or "Unknown",
+            "city": data.get("city") or "Unknown",
+        }
+        return data
     except Exception as e:
         logger.error(f"Error extracting location: {e}")
 
@@ -70,8 +68,14 @@ def extract_utm_data(url: str) -> dict:
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
     utm_data = {
-        "utm_source": query_params.get("utm_source", [None])[0],
-        "utm_medium": query_params.get("utm_medium", [None])[0],
-        "utm_campaign": query_params.get("utm_campaign", [None])[0],
+        "utm_source": query_params.get("utm_source")[0]
+        if query_params.get("utm_source")
+        else "N/A",
+        "utm_medium": query_params.get("utm_medium")[0]
+        if query_params.get("utm_medium")
+        else "N/A",
+        "utm_campaign": query_params.get("utm_campaign")[0]
+        if query_params.get("utm_campaign")
+        else "N/A",
     }
-    return {k: v for k, v in utm_data.items() if v is not None}
+    return utm_data
