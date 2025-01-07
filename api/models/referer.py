@@ -1,3 +1,5 @@
+from typing import Optional
+
 from models import Base
 from sqlalchemy import insert, select
 from sqlalchemy.orm import Mapped, Session, relationship
@@ -5,9 +7,8 @@ from utils import extract_referer
 
 
 class RefererMapper(Base):
-    full_url: Mapped[str | None]
-    domain: Mapped[str | None]
-    path: Mapped[str | None]
+    full_url: Mapped[Optional[str]]
+    domain: Mapped[Optional[str]]
 
     click: Mapped["ClickMapper"] = relationship(back_populates="referer")
 
@@ -15,12 +16,9 @@ class RefererMapper(Base):
     def create(cls, session: Session, **kwargs):
         referer = kwargs.get("referer")
         referer_data = extract_referer(referer)
-        query = select(cls)
-        if referer_data.get("domain"):
-            query = query.filter_by(domain=referer_data["domain"])
-        if referer_data.get("path"):
-            query = query.filter_by(path=referer_data["path"])
-        record = session.scalars(query).first()
+        record = session.scalars(
+            select(cls).filter_by(domain=referer_data["domain"])
+        ).first()
         return (
             record
             if record
