@@ -15,6 +15,7 @@ class LinkSchemaUpdate(BaseModel):
 
 
 class LinkSchemaOut(LinkSchemaIn):
+    generated_url: str
     shortcode: str
     count: int
     utm: Optional[UtmLinkSchemaOut] = None
