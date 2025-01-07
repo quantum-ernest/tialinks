@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import RedirectResponse
 from typing import List, Optional
@@ -29,6 +31,11 @@ async def redirect(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"TiaLinks: Unable to locate short url /{shortcode}",
+        )
+    if link.expires_at < datetime.now():
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="TiaLinks: Shortcode not active",
         )
     user_agent_data = request.headers.get("User-Agent")
     user_agent = (
