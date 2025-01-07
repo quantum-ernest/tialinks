@@ -56,12 +56,11 @@ async def update(
         session=session,
         campaign=data.campaign,
         source=data.source,
+        medium=data.medium,
         user_id=auth_user.get("user_id"),
     )
     if val_utm:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Utm already exists"
-        )
+        return val_utm
     data = data.model_dump()
     data.update({"id": id, "user_id": auth_user.get("user_id")})
     return UtmMapper.update(session=session, data=data)
