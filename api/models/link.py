@@ -8,6 +8,7 @@ from typing import Optional
 
 class LinkMapper(Base):
     original_url: Mapped[str]
+    generated_url: Mapped[str]
     shortcode: Mapped[str] = mapped_column(unique=True)
     count: Mapped[int] = mapped_column(default=0)
     expires_at: Mapped[Optional[datetime]]
