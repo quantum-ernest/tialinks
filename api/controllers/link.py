@@ -5,7 +5,7 @@ from typing import List
 from models import LinkMapper, UtmMapper
 from schemas import LinkSchemaOut, LinkSchemaIn, LinkSchemaUpdate
 from services import IsAuthenticated
-from utils import generate_readable_short_code, extract_utm_data
+from utils import generate_readable_short_code
 
 router = APIRouter(prefix="/api/links", tags=["LINK"])
 
@@ -37,23 +37,10 @@ async def create(
             shortcode = new_shortcode
             break
     original_url = str(data.get("original_url"))
-    utm_data = extract_utm_data(original_url)
-    utm = UtmMapper.validate_utm(
+    utm = UtmMapper.create_from_link(
         session=session,
-        campaign=utm_data.get("utm_campaign"),
-        source=utm_data.get("utm_source"),
-        user_id=auth_user.get("user_id"),
+        data=original_url,
     )
-    if not utm and utm_data.get("utm_campaign") and utm_data.get("utm_source"):
-        utm = UtmMapper.create(
-            session=session,
-            data={
-                "campaign": utm_data.get("utm_campaign"),
-                "source": utm_data.get("utm_source"),
-                "medium": utm_data.get("utm_medium"),
-                "user_id": auth_user.get("user_id"),
-            },
-        )
     base_url = (
         env.BASE_URL
     )  # Todo: implement user configured url or default url(BASE_URL)
