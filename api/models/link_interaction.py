@@ -12,6 +12,7 @@ class LinkInteractionMapper(Base):
     link_id: Mapped[int] = mapped_column(index=True)
     shortcode: Mapped[str] = mapped_column(index=True)
     original_url: Mapped[str] = mapped_column(index=True)
+    generated_url: Mapped[str] = mapped_column(index=True)
     campaign: Mapped[Optional[str]] = mapped_column(index=True)
     source: Mapped[Optional[str]] = mapped_column(index=True)
     medium: Mapped[Optional[str]] = mapped_column(index=True)
