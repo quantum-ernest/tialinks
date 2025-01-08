@@ -1,5 +1,7 @@
-import {useEffect, useState} from 'react'
+import {useState} from 'react'
 import {displayNotifications} from "@/utils/notifications";
+import {getToken} from "@/utils/auth";
+import {useRouter} from "next/navigation";
 
 interface DashboardPrams {
     total_links: number,
@@ -38,14 +40,18 @@ const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 export const useDashboard = () => {
     const {contextHolder, openNotification} = displayNotifications();
     const [loading, setLoading] = useState(false)
-    const [dashboardData, setDashboardData] = useState<DashboardPrams[]|null>(null)
-
+    const [dashboardData, setDashboardData] = useState<DashboardPrams[] | null>(null)
+    const router = useRouter();
+    const token = getToken()
+    if (!token) {
+        router.push('/login')
+    }
     const fetchData = async () => {
         try {
             setLoading(true)
-            const token = localStorage.getItem("access_token")
+            const token = getToken()
             if (!token) {
-                openNotification("error", "No access token provided")
+                router.push('/login')
             }
             const response = await fetch(apiUrl + '/api/analytics/dashboard', {
                 method: 'GET',
@@ -58,14 +64,12 @@ export const useDashboard = () => {
             setDashboardData(data)
             setLoading(false)
         } catch (error) {
+            // @ts-ignore
             openNotification("error", "Unable to get dashboard data", error.message)
         } finally {
             setLoading(false)
 
         }
     }
-    useEffect(() => {
-        fetchData()
-    }, [])
-    return {loading, dashboardData, contextHolder}
+    return {loading, fetchData, dashboardData, contextHolder}
 }
