@@ -4,101 +4,18 @@ import React, {useState, useEffect} from 'react';
 import {Layout, Row, Col, Card, Table, Typography, Select, DatePicker, Tabs, Statistic} from 'antd';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-    LineChart, Line, PieChart, Pie, Cell, Treemap, Scatter, ScatterChart
+    LineChart, Line, PieChart, Pie, Cell, Treemap
 } from 'recharts';
 import {useAnalytics} from "@/hooks/Analytics";
 import {useLinks} from "@/hooks/Links";
 import dayjs from 'dayjs';
-// import GeographicalMap from "@/components/WorldMap"
-// import MapChart from "@/components/WorldMap";
-const {Header, Content} = Layout;
-const {Title, Text} = Typography;
+import GeographicalMap from "@/components/GeograhicalMap";
+
+
+const {Content} = Layout;
+const {Title} = Typography;
 const {RangePicker} = DatePicker;
 const {TabPane} = Tabs;
-
-// Mock data (replace with actual API calls in a real application)
-const mockData = {
-    totalClicks: 150000,
-    uniqueLinks: 500,
-    campaigns: [
-        {name: 'Summer Sale', clicks: 50000},
-        {name: 'Product Launch', clicks: 30000},
-        {name: 'Email Newsletter', clicks: 20000},
-        {name: 'Social Media', clicks: 15000},
-        {name: 'Affiliate', clicks: 10000},
-    ],
-    topLinks: [
-        {shortcode: 'abc123', clicks: 5000, original_url: 'https://example.com/page1', campaign: 'Summer Sale'},
-        {shortcode: 'def456', clicks: 4500, original_url: 'https://example.com/page2', campaign: 'Product Launch'},
-        {shortcode: 'ghi789', clicks: 4000, original_url: 'https://example.com/page3', campaign: 'Email Newsletter'},
-    ],
-    trafficSources: [
-        {name: 'Direct', value: 40000},
-        {name: 'Social', value: 30000},
-        {name: 'Email', value: 20000},
-        {name: 'Referral', value: 10000},
-    ],
-    mediums: [
-        {name: 'Organic', value: 50000},
-        {name: 'CPC', value: 30000},
-        {name: 'Social', value: 20000},
-        {name: 'Email', value: 15000},
-        {name: 'Affiliate', value: 10000},
-    ],
-    devices: [
-        {name: 'Desktop', value: 90000},
-        {name: 'Mobile', value: 45000},
-        {name: 'Tablet', value: 15000},
-    ],
-    browsers: [
-        {name: 'Chrome', value: 75000},
-        {name: 'Firefox', value: 30000},
-        {name: 'Safari', value: 22500},
-        {name: 'Edge', value: 15000},
-        {name: 'Others', value: 7500},
-    ],
-    operatingSystems: [
-        {name: 'Windows', value: 67500},
-        {name: 'macOS', value: 45000},
-        {name: 'iOS', value: 22500},
-        {name: 'Android', value: 15000},
-    ],
-    topLocations: [
-        {
-            continent: 'North America',
-            country: 'United States',
-            region: 'California',
-            city: 'San Francisco',
-            clicks: 30000
-        },
-        {continent: 'Europe', country: 'United Kingdom', region: 'England', city: 'London', clicks: 25000},
-        {continent: 'Asia', country: 'India', region: 'Maharashtra', city: 'Mumbai', clicks: 20000},
-        {continent: 'Oceania', country: 'Australia', region: 'New South Wales', city: 'Sydney', clicks: 15000},
-        {continent: 'Europe', country: 'Germany', region: 'Bavaria', city: 'Munich', clicks: 10000},
-    ],
-    clickTrends: [
-        {date: '2023-01', clicks: 10000},
-        {date: '2023-02', clicks: 12000},
-        {date: '2023-03', clicks: 15000},
-        {date: '2023-04', clicks: 13000},
-        {date: '2023-05', clicks: 16000},
-        {date: '2023-06', clicks: 18000},
-    ],
-    domainPerformance: [
-        {domain: 'example.com', clicks: 50000},
-        {domain: 'blog.example.com', clicks: 30000},
-        {domain: 'shop.example.com', clicks: 20000},
-        {domain: 'support.example.com', clicks: 15000},
-        {domain: 'news.example.com', clicks: 10000},
-    ],
-    pathAnalysis: [
-        {path: '/product', clicks: 40000},
-        {path: '/blog', clicks: 30000},
-        {path: '/about', clicks: 20000},
-        {path: '/contact', clicks: 15000},
-        {path: '/support', clicks: 10000},
-    ],
-};
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82ca9d', '#ffc658', '#8dd1e1'];
 const dateFormat = 'YYYY-MM-DDTHH:mm:ss'
@@ -111,8 +28,8 @@ const EnhancedAnalytics: React.FC = () => {
     const defaultEndDate = dayjs(new Date().setFullYear(new Date().getFullYear() + 1)).format(dateFormat);
     useEffect(() => {
         fetchAnalytics(defaultStartDate, defaultEndDate);
-        let start_date = dateRange ? dateRange[0] : defaultStartDate;
-        let end_date = dateRange ? dateRange[1] : defaultEndDate;
+        const start_date = dateRange ? dateRange[0] : defaultStartDate;
+        const end_date = dateRange ? dateRange[1] : defaultEndDate;
         if (selectedLink) {
             fetchAnalytics(start_date, end_date, selectedLink);
         } else {
@@ -432,9 +349,9 @@ const EnhancedAnalytics: React.FC = () => {
                                 </Col>
                             </Row>
                         </TabPane>
-                        {/*<TabPane tab="Domain & Path Analysis" key="6">*/}
-                        {/*    <MapChart />*/}
-                        {/*</TabPane>*/}
+                        <TabPane tab="Domain & Path Analysis" key="6">
+                            <GeographicalMap geographicalData={analyticsData?.geographical_data}/>
+                        </TabPane>
                     </Tabs>
                 </Content>
             </Layout>
