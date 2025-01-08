@@ -12,6 +12,7 @@ import {
 import Link from 'next/link'
 import {MdOutlineCampaign} from "react-icons/md";
 import {ImQrcode} from "react-icons/im";
+import {getUserObject} from "@/utils/auth";
 
 const {Header, Sider, Content} = Layout
 const {Search} = Input
@@ -23,9 +24,8 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     const [collapsed, setCollapsed] = useState(false)
-    const user = localStorage.getItem('user')
-
-    const userData = JSON.parse(user)
+    const userObject = getUserObject()
+    const userData = userObject? JSON.parse(userObject): null
 
     return (
         <Layout style={{minHeight: '100vh'}}>
@@ -91,7 +91,7 @@ export default function DashboardLayout({
                     />
                     <div style={{display: 'flex', alignItems: 'center'}}>
                         <Avatar icon={<UserOutlined/>} style={{backgroundColor: '#7C3AED'}}/>
-                        <Text style={{marginLeft: 8}}>{userData? userData.name: userData.email}</Text>
+                        <Text style={{marginLeft: 8}}>{userData? userData?.name: userData?.email}</Text>
                     </div>
                 </Header>
                 <Content style={{margin: '24px 16px', padding: 24, background: '#fff', borderRadius: 8}}>
