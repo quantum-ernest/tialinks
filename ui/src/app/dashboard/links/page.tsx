@@ -1,13 +1,14 @@
 'use client'
 
 import {useState, useEffect} from 'react'
-import {Table, Button, Input, Space, Tag, message, Modal, Form, Flex} from 'antd'
+import {Table, Button, Input, Space, Tag, message, Modal, Form, Flex, Tooltip} from 'antd'
 import {SearchOutlined, PlusOutlined} from '@ant-design/icons'
 import {SiSimpleanalytics} from "react-icons/si";
 import {useLinks} from "@/hooks/Links"
 
 const {Search} = Input
 
+// Todo: Add link status feature
 export default function LinksPage() {
     const {loading, linkData, createLink, contextHolder, openNotification} = useLinks()
     const [searchText, setSearchText] = useState('')
@@ -19,7 +20,14 @@ export default function LinksPage() {
             title: 'Original URL',
             dataIndex: 'original_url',
             key: 'original_url',
-            ellipsis: true,
+            ellipsis: {
+                showTitle: false,
+            },
+            render: (original_url) => (
+                <Tooltip placement="topLeft" title={original_url}>
+                    {original_url}
+                </Tooltip>
+            )
         },
         {
             title: 'Short URL',
@@ -35,24 +43,24 @@ export default function LinksPage() {
             title: 'Clicks',
             dataIndex: 'count',
             key: 'count',
-            sorter: (a: any, b: any) => a.clicks - b.clicks,
+            sorter: (a: any, b: any) => a.count - b.count,
         },
         {
             title: 'Created',
             dataIndex: 'created_at',
             key: 'created_at',
-            sorter: (a: any, b: any) => new Date(a.created_at) - new Date(b.created_at),
+            sorter: (a: any, b: any) => a.created_at - b.created_at
         },
-        // {
-        //   title: 'Status',
-        //   dataIndex: 'status',
-        //   key: 'status',
-        //   render: (status: string) => (
-        //     <Tag color={status === 'active' ? 'green' : 'red'}>
-        //       {status.toUpperCase()}
-        //     </Tag>
-        //   ),
-        // },
+        {
+            title: 'Status',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status: string) => (
+                <Tag color={status === 'active' ? 'green' : 'red'}>
+                    {status}
+                </Tag>
+            ),
+        },
         {
             title: 'Action',
             key: 'action',
