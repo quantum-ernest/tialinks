@@ -1,9 +1,11 @@
-import {useState, useEffect} from "react";
+import {useState} from "react";
 import {displayNotifications} from "@/utils/notifications";
+import {getToken} from "@/utils/auth";
 
-interface LinkParams {
+export interface LinkParams {
     id: number
     original_url: string
+    generated_url: string;
     shortcode: string
     count: number
     created_at: string
@@ -12,14 +14,14 @@ interface LinkParams {
 export const useLinks = () => {
     const {openNotification, contextHolder} = displayNotifications()
     const [loading, setLoading] = useState(false)
-    const [linkData, setLinkData] = useState<LinkParams[]|null>(null)
+    const [linkData, setLinkData] = useState<LinkParams[] | null>(null)
     const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
-    const token = localStorage.getItem('access_token')
 
 
     const fetchLinks = async () => {
-        setLoading(true)
         try {
+            setLoading(true)
+            const token = getToken()
             const response = await fetch(apiUrl + '/api/links', {
                 method: 'GET',
                 headers: {'accept': 'application/json', 'Authorization': `Bearer ${token}`},
@@ -52,6 +54,7 @@ export const useLinks = () => {
     const createLink = async (originalUrl: string) => {
         try {
             setLoading(true)
+            const token = getToken()
             const response = await fetch(apiUrl + '/api/links', {
                 method: 'POST',
                 headers: {
@@ -65,6 +68,7 @@ export const useLinks = () => {
             }
             const newLink: LinkParams = await response.json()
             setLinkData((prevData) => (prevData ? [newLink, ...prevData] : [newLink]));
+            return newLink
         } catch (error) {
             // @ts-ignore
             openNotification('error', "Unable to create links.", error.message)
@@ -72,8 +76,5 @@ export const useLinks = () => {
             setLoading(false)
         }
     }
-    useEffect(() => {
-        fetchLinks()
-    }, [])
-    return {loading, contextHolder, linkData, createLink, openNotification}
+    return {loading, contextHolder, linkData, fetchLinks, createLink, openNotification}
 }
