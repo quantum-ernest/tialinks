@@ -1,8 +1,8 @@
 'use client'
 
 import {useState, useEffect} from 'react'
-import {Table, Button, Input, Space, Tag, message, Modal, Form, Flex, Tooltip} from 'antd'
-import {SearchOutlined, PlusOutlined} from '@ant-design/icons'
+import {Table, Button, Input, Space, Tag, Modal, Form, Flex, Tooltip} from 'antd'
+import {PlusOutlined} from '@ant-design/icons'
 import {SiSimpleanalytics} from "react-icons/si";
 import {useLinks} from "@/hooks/Links"
 
@@ -10,7 +10,7 @@ const {Search} = Input
 
 // Todo: Add link status feature
 export default function LinksPage() {
-    const {loading, linkData, createLink, contextHolder, openNotification} = useLinks()
+    const {loading, linkData, fetchLinks, createLink, contextHolder, openNotification} = useLinks()
     const [searchText, setSearchText] = useState('')
     const [form] = Form.useForm()
 
@@ -94,6 +94,9 @@ export default function LinksPage() {
         form.resetFields()
 
     };
+    useEffect(()=>{
+        fetchLinks()
+    }, [])
     return (
         <>
             {contextHolder}
