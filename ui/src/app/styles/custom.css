@@ -1,11 +1,38 @@
 /* Custom styles for TiaLinks */
 .tialinks-header {
   padding: 0 50px;
-  background: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: fixed;
+  position: sticky;
+  top: 0;
+  z-index: 1;
   width: 100%;
-  z-index: 1000;
+    background: #fff;
+
+}
+
+.desktop-menu {
+  display: none;
+}
+
+.mobile-menu-toggle {
+  display: block;
+}
+
+.mobile-menu {
+  background: #fff;
+  padding: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+@media (min-width: 768px) {
+  .desktop-menu {
+    display: block;
+  }
+
+  .mobile-menu-toggle,
+  .mobile-menu {
+    display: none;
+  }
 }
 
 .tialinks-hero {
@@ -37,10 +64,22 @@
   transform: scale(1.02);
 }
 
-.tialinks-footer {
-  background-color: #f3f4f6;
+@media (max-width: 576px) {
+  .tialinks-footer {
+      background-color: #f3f4f6;
   padding: 48px 0;
+    text-align: center;
+  }
+
+  .tialinks-footer .ant-row-space-between {
+    justify-content: center;
+  }
+
+  .tialinks-footer .ant-col {
+    margin-bottom: 24px;
+  }
 }
+
 
 .ant-input-search .ant-input {
   height: 50px;
@@ -66,3 +105,38 @@
     min-height: auto;
   }
 }
+
+.join-community-section {
+  padding: 48px 16px;
+  background-color: #F3F4F6;
+}
+
+.join-community-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 24px;
+  color: #1F2937;
+  text-align: center;
+}
+
+.join-community-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.join-community-content .ant-typography {
+  font-size: clamp(1rem, 2vw, 1.125rem);
+  color: #4B5563;
+  margin-bottom: 16px;
+}
+
+@media (max-width: 767px) {
+  .join-community-section {
+    padding: 32px 16px;
+  }
+
+  .join-community-content {
+    text-align: center;
+  }
+}
+
