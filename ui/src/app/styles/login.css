@@ -19,11 +19,8 @@
   background-color: #7C3AED;
   color: white;
   padding: 2rem;
+  margin-bottom: 3rem;
   text-align: center;
-}
-
-.login-form {
-  padding: 2rem;
 }
 
 .login-input {

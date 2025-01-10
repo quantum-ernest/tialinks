@@ -1,7 +1,7 @@
 'use client'
 
 import {useState} from 'react'
-import {Card, Input, Button, Typography, Form} from 'antd'
+import {Card, Input, Button, Typography, Form, Flex} from 'antd'
 import {MailOutlined} from '@ant-design/icons'
 import {InputOTP} from 'antd-input-otp';
 import '../styles/login.css'
@@ -13,7 +13,7 @@ type OTP = string[] | null
 export default function LoginPage() {
     const [form] = Form.useForm();
     const [email, setEmail] = useState('');
-    const {step, contextHolder, openNotification, loading, submitOTP, requestOTP} = useAuth();
+    const {step, setStep, contextHolder, openNotification, loading, submitOTP, requestOTP} = useAuth();
     const handleEmailSubmit = async () => {
         await requestOTP(email)
     }
@@ -40,6 +40,7 @@ export default function LoginPage() {
                             <Form onFinish={handleEmailSubmit}>
                                 <Form.Item
                                     name="email"
+                                    wrapperCol={{ span: 24 }}
                                     rules={[
                                         {required: true, message: 'Please input your email!'},
                                         {type: 'email', message: 'Please enter a valid email!'}
@@ -70,8 +71,17 @@ export default function LoginPage() {
                             </Form>
                         ) : (
                             <Form layout={"vertical"} onFinish={handleOtpSubmit} form={form}>
-                                <Form.Item label="Enter OTP" name="otp">
+                                <Form.Item name="otp">
                                     <InputOTP autoSubmit={handleOtpSubmit} autoFocus={true} inputType="numeric"/>
+                                </Form.Item>
+                                <Form.Item>
+                                    <Flex justify='space-between' >
+
+                                    <Button onClick={() =>{setStep('email')}}>Change Email</Button>
+                                    <Button onClick={handleEmailSubmit}>
+                                        Request New OTP
+                                    </Button>
+                                    </Flex>
                                 </Form.Item>
                             </Form>
                         )}
