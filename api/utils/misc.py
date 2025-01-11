@@ -1,4 +1,3 @@
-import base64
 import random
 import re
 import requests
@@ -56,12 +55,10 @@ def extract_location(value: str) -> dict:
         logger.error(f"Error extracting location: {e}")
 
 
-def get_favicon(url: str):
-    google_url = f"https://www.google.com/s2/favicons?domain={url}&sz=128"
-    response = requests.get(google_url)
-    if response.status_code == 200:
-        return base64.b64encode(response.content).decode("utf-8")
-    return None
+def build_favicon_url(url: str):
+    parser_obj = urlparse(url)
+    domain = getattr(parser_obj, "netloc")
+    return f"https://www.google.com/s2/favicons?domain={domain}&sz=64"
 
 
 def extract_utm_data(url: str) -> dict:
