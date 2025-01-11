@@ -36,13 +36,14 @@ class UtmMapper(Base):
     @classmethod
     def create_from_link(cls, session: Session, **kwargs):
         data = kwargs.get("data")
+        user_id = kwargs.get("user_id")
         utm_data = extract_utm_data(data)
         record = session.scalars(
             select(cls).filter_by(
-                user_id=utm_data["user_id"],
-                campaign=utm_data["campaign"],
-                source=utm_data["source"],
-                medium=utm_data["medium"],
+                user_id=user_id,
+                campaign=utm_data["utm_campaign"],
+                source=utm_data["utm_source"],
+                medium=utm_data["utm_medium"],
             )
         ).first()
         return (

@@ -18,6 +18,7 @@ class LinkMapper(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("user.id", ondelete="SET NULL"),
     )
+    favicon_url: Mapped[str]
 
     user: Mapped["UserMapper"] = relationship(back_populates="link")
     click: Mapped["ClickMapper"] = relationship(back_populates="link")
