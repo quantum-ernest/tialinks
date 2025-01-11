@@ -5,7 +5,7 @@ from typing import List
 from models import LinkMapper, UtmMapper
 from schemas import LinkSchemaOut, LinkSchemaIn, LinkSchemaUpdate
 from services import IsAuthenticated
-from utils import generate_readable_short_code
+from utils import generate_readable_short_code, build_favicon_url
 
 router = APIRouter(prefix="/api/links", tags=["LINK"])
 
@@ -39,8 +39,10 @@ async def create(
     original_url = str(data.get("original_url"))
     utm = UtmMapper.create_from_link(
         session=session,
+        user_id=auth_user["user_id"],
         data=original_url,
     )
+    favicon_url = build_favicon_url(original_url)
     base_url = (
         env.BASE_URL
     )  # Todo: implement user configured url or default url(BASE_URL)
@@ -49,6 +51,7 @@ async def create(
             "original_url": original_url,
             "generated_url": base_url + "/" + shortcode,
             "shortcode": shortcode,
+            "favicon_url": favicon_url,
             "utm_id": utm.id if utm else None,
             "user_id": auth_user.get("user_id"),
         }
