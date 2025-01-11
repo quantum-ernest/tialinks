@@ -5,6 +5,7 @@ import {Table, Button, Input, Space, Tag, Modal, Form, Flex, Tooltip} from 'antd
 import {PlusOutlined} from '@ant-design/icons'
 import {SiSimpleanalytics} from "react-icons/si";
 import {useLinks} from "@/hooks/Links"
+import Image from "next/image";
 
 const {Search} = Input
 
@@ -13,8 +14,6 @@ export default function LinksPage() {
     const {loading, linkData, fetchLinks, createLink, contextHolder, openNotification} = useLinks()
     const [searchText, setSearchText] = useState('')
     const [form] = Form.useForm()
-
-
     const columns = [
         {
             title: 'Original URL',
@@ -23,10 +22,25 @@ export default function LinksPage() {
             ellipsis: {
                 showTitle: false,
             },
-            render: (original_url) => (
-                <Tooltip placement="topLeft" title={original_url}>
-                    {original_url}
-                </Tooltip>
+            render: (original_url, record) => (
+                <>
+                    <Flex align='center'>
+                        <Image
+                            src={record.favicon_url}
+                            width={20}
+                            height={20}
+                            alt='favicon'
+                            style={{marginRight: '5px'}}
+                            onError={(event) => {
+                                event.target.id = "/earth.png";
+                                event.target.srcset = "/earth.png";
+                            }}
+                        />
+                        <Tooltip placement="topLeft" title={original_url}>
+                            {original_url}
+                        </Tooltip>
+                    </Flex>
+                </>
             )
         },
         {
@@ -94,7 +108,7 @@ export default function LinksPage() {
         form.resetFields()
 
     };
-    useEffect(()=>{
+    useEffect(() => {
         fetchLinks()
     }, [])
     return (
