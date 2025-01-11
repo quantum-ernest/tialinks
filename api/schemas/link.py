@@ -22,4 +22,5 @@ class LinkSchemaOut(LinkSchemaIn):
     expires_at: Optional[datetime] = None
     user: UserSchemaOut
     created_at: datetime
+    favicon_url: str
     id: int
