@@ -9,6 +9,7 @@ export interface LinkParams {
     shortcode: string
     count: number
     created_at: string
+    favicon_url: string
 }
 
 export const useLinks = () => {
@@ -30,7 +31,7 @@ export const useLinks = () => {
                 throw new Error(response.statusText)
             }
             const data: LinkParams[] = await response.json()
-            const formattedData: LinkParams[] = data.map((link: any) => ({
+            const formattedData: LinkParams[] = data.map((link: LinkParams) => ({
                 ...link,
                 created_at: new Date(link.created_at.split('.')[0]).toLocaleString('en-US', {
                     year: 'numeric',
