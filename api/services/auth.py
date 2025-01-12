@@ -1,18 +1,16 @@
 from datetime import datetime, timedelta
 
-import redis
 from fastapi import HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import EmailStr
 
-from core import env
+from core import env, redis_db
 from schemas import OtpEmailLoginSchemaIn
 from services import MailService
 from utils import generate_otp, login_otp_template
 
-_redis = redis.Redis(host=env.REDIS_HOST, port=env.REDIS_PORT, decode_responses=True)
 mail_service = MailService()
 
 
@@ -64,7 +62,7 @@ class AuthService:
     def send_otp_via_email(cls, email: EmailStr) -> bool:
         otp = generate_otp()
         try:
-            _redis.setex(name=str(email), value=otp, time=300)
+            redis_db.setex(name=str(email), value=otp, time=300)
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -76,7 +74,7 @@ class AuthService:
 
     @classmethod
     def verity_email_otp(cls, credential: OtpEmailLoginSchemaIn) -> bool:
-        if _redis.get(name=str(credential.email)) == credential.otp:
+        if redis_db.get(name=str(credential.email)) == credential.otp:
             return True
         return False
 
