@@ -4,7 +4,7 @@ import {useState, useEffect} from 'react'
 import {Table, Button, Input, Space, Tag, Modal, Form, Flex, Tooltip} from 'antd'
 import {PlusOutlined} from '@ant-design/icons'
 import {SiSimpleanalytics} from "react-icons/si";
-import {useLinks} from "@/hooks/Links"
+import {LinkParams, useLinks} from "@/hooks/Links"
 import Image from "next/image";
 
 const {Search} = Input
@@ -22,7 +22,7 @@ export default function LinksPage() {
             ellipsis: {
                 showTitle: false,
             },
-            render: (original_url, record) => (
+            render: (original_url: string, record: LinkParams) => (
                 <>
                     <Flex align='center'>
                         <Image
@@ -70,7 +70,7 @@ export default function LinksPage() {
             dataIndex: 'status',
             key: 'status',
             render: (status: string) => (
-                <Tag color={status === 'active' ? 'green' : 'red'}>
+                <Tag color={status === 'active' ? 'green' : 'volcano'}>
                     {status}
                 </Tag>
             ),
