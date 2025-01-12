@@ -9,7 +9,6 @@ import Image from "next/image";
 
 const {Search} = Input
 
-// Todo: Add link status feature
 export default function LinksPage() {
     const {loading, linkData, fetchLinks, createLink, contextHolder, openNotification} = useLinks()
     const [searchText, setSearchText] = useState('')
@@ -18,6 +17,7 @@ export default function LinksPage() {
         {
             title: 'Original URL',
             dataIndex: 'original_url',
+            width: 100,
             key: 'original_url',
             ellipsis: {
                 showTitle: false,
@@ -37,7 +37,7 @@ export default function LinksPage() {
                             }}
                         />
                         <Tooltip placement="topLeft" title={original_url}>
-                            {original_url}
+                            { original_url.length > 50? original_url.substring(0,50) + '...': original_url}
                         </Tooltip>
                     </Flex>
                 </>
@@ -45,13 +45,18 @@ export default function LinksPage() {
         },
         {
             title: 'Short URL',
-            dataIndex: 'shortcode',
-            key: 'shortcode',
+            dataIndex: 'generated_url',
+            key: 'generated_url',
             render: (text: string) => (
                 <a href={`https://${text}`} target="_blank" rel="noopener noreferrer">
                     {text}
                 </a>
             ),
+        },
+        {
+            title: 'Short Code',
+            dataIndex: 'shortcode',
+            key: 'shortcode',
         },
         {
             title: 'Clicks',
@@ -78,6 +83,7 @@ export default function LinksPage() {
         {
             title: 'Action',
             key: 'action',
+            // fixed: 'right',
             render: () => (
                 <Space size="middle">
                     <Button type="link" icon={<SiSimpleanalytics color={'#7C3AED'}/>}>Analytics</Button>
@@ -115,16 +121,14 @@ export default function LinksPage() {
         <>
             {contextHolder}
             <div className="space-y-4">
-                <Flex justify="space-between">
+                <Flex justify="space-between" align='center'>
                     <Search
-                        placeholder="Search links..."
+                        placeholder="Search..."
                         allowClear
                         onChange={(e) => setSearchText(e.target.value)}
-                        style={{width: 300}}
+                        style={{width: '40%'}}
                     />
-                    <Button type="primary" icon={<PlusOutlined/>} onClick={showModal}>
-                        Create New Link
-                    </Button>
+                    <Button type="primary"  icon={<PlusOutlined/>} onClick={showModal}>Link</Button>
                 </Flex>
                 <Table
                     columns={columns}
@@ -133,8 +137,15 @@ export default function LinksPage() {
                         link.shortcode.toLowerCase().includes(searchText.toLowerCase())
                     )}
                     loading={loading}
-                    pagination={{pageSize: 10}}
+                    pagination={{
+                        pageSize: 10,
+                        responsive: true,
+                        showSizeChanger: true,
+                        showQuickJumper: true,
+                    }}
                     rowKey="key"
+                    scroll={{x: 'max-content'}}
+                    size="middle"
                 />
 
                 <Modal
