@@ -23,4 +23,5 @@ class LinkSchemaOut(LinkSchemaIn):
     user: UserSchemaOut
     created_at: datetime
     favicon_url: str
+    status: Optional[str] = None
     id: int
