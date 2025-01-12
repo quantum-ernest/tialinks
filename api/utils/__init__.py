@@ -7,5 +7,6 @@ from .misc import (
     extract_referer,
     extract_utm_data,
     build_favicon_url,
+    ping_urls,
 )
 from .mail_templates import login_otp_template

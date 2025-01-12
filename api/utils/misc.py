@@ -1,9 +1,13 @@
 import random
 import re
+from datetime import timedelta
+from typing import List
+
 import requests
 from user_agents import parse
 from urllib.parse import urlparse, parse_qs
 from loguru import logger
+from core import redis_db
 
 
 def camel_to_snake(name):
@@ -76,3 +80,21 @@ def extract_utm_data(url: str) -> dict:
         else "N/A",
     }
     return utm_data
+
+
+def ping_urls(links: List["LinkMapper"]) -> List["LinkMapper"]:
+    for link in links:
+        status = redis_db.get(name=link.id)
+        if status:
+            link.status = status
+            continue
+        try:
+            response = requests.get(link.original_url, timeout=5)
+            if 200 <= response.status_code < 300:
+                link.status = "active"
+            else:
+                link.status = "inactive"
+        except Exception:
+            link.status = "inactive"
+        redis_db.setex(name=link.id, value=link.status, time=timedelta(minutes=15))
+    return links
