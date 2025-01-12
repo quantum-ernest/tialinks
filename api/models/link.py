@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy.util import hybridproperty
+
 from models import Base
 from sqlalchemy import ForeignKey, select, func
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
@@ -23,6 +25,10 @@ class LinkMapper(Base):
     user: Mapped["UserMapper"] = relationship(back_populates="link")
     click: Mapped["ClickMapper"] = relationship(back_populates="link")
     utm: Mapped["UtmMapper"] = relationship(back_populates="link")
+
+    @hybridproperty
+    def status(self):
+        return ""
 
     @classmethod
     def get_by_id(cls, session: Session, pk_id: int, **kwargs):
