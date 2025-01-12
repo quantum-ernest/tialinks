@@ -10,6 +10,7 @@ export interface LinkParams {
     count: number
     created_at: string
     favicon_url: string
+    status: string
 }
 
 export const useLinks = () => {
