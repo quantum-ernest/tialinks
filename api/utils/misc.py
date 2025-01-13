@@ -96,5 +96,5 @@ def ping_urls(links: List["LinkMapper"]) -> List["LinkMapper"]:
                 link.status = "inactive"
         except Exception:
             link.status = "inactive"
-        redis_db.setex(name=link.id, value=link.status, time=timedelta(minutes=15))
+        redis_db.setex(name=link.id, value=link.status, time=timedelta(minutes=25))
     return links
