@@ -32,7 +32,9 @@ export default function LinksPage() {
                             alt='favicon'
                             style={{marginRight: '5px'}}
                             onError={(event) => {
+                                // @ts-ignore
                                 event.target.id = "/earth.png";
+                                // @ts-ignore
                                 event.target.srcset = "/earth.png";
                             }}
                         />
@@ -62,13 +64,12 @@ export default function LinksPage() {
             title: 'Clicks',
             dataIndex: 'count',
             key: 'count',
-            sorter: (a: any, b: any) => a.count - b.count,
+            sorter: (a: LinkParams, b: LinkParams) => a.count - b.count,
         },
         {
             title: 'Created',
             dataIndex: 'created_at',
             key: 'created_at',
-            sorter: (a: any, b: any) => a.created_at - b.created_at
         },
         {
             title: 'Status',
@@ -104,6 +105,7 @@ export default function LinksPage() {
             await createLink(values.url)
             form.resetFields()
         } catch (error) {
+            // @ts-ignore
             openNotification('error', error?.message)
         }
         setIsModalOpen(false);
