@@ -132,7 +132,7 @@ export default function LinksPage() {
                 </Flex>
                 <Table
                     columns={columns}
-                    dataSource={linkData?.filter((link: any) =>
+                    dataSource={linkData?.filter((link: LinkParams) =>
                         link.original_url.toLowerCase().includes(searchText.toLowerCase()) ||
                         link.shortcode.toLowerCase().includes(searchText.toLowerCase())
                     )}
