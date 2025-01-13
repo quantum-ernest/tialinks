@@ -102,8 +102,12 @@ export default function DashboardLayout({
                 breakpoint="md"
                 collapsedWidth={isSmallScreen ? 0 : 80}
                 style={{
+                    overflow: 'auto',
+                    position: 'fixed',
+                    insetInlineStart: 0,
+                    scrollbarWidth: 'thin',
+                    scrollbarGutter: 'stable',
                     background: '#fff',
-                    position: isSmallScreen ? 'fixed' : 'relative',
                     left: 0,
                     top: 0,
                     bottom: 0,
@@ -138,7 +142,7 @@ export default function DashboardLayout({
                     style={{borderRight: 0}}
                 />
             </Sider>
-            <Layout>
+            <Layout style={{ marginInlineStart: isSmallScreen? 'auto': !collapsed ? 190: 70 }}>
                 <Header style={{
                     padding: '0 16px',
                     background: '#fff',

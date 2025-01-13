@@ -18,6 +18,8 @@ const themeConfig: ThemeConfig = {
         },
         Menu: {
             itemSelectedColor: '#7C3AED',
+            itemHeight: 80,
+            fontSize: 15,
         },
         Layout: {
             bodyBg: '#f0f2f5',
