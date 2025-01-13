@@ -1,21 +1,19 @@
 'use client'
-import {useState} from 'react'
-import { Button, Input, Modal, Form, Spin, Typography, Flex, Table, Space, Tag, TableProps} from 'antd'
+import {useEffect, useState} from 'react'
+import {Button, Input, Modal, Form, Flex, Table, Space, Tag, TableProps} from 'antd'
 import {PlusOutlined} from '@ant-design/icons'
 import {useUtm} from '@/hooks/Utm'
 import {CiEdit} from "react-icons/ci";
 import {UtmParams} from '@/hooks/Utm'
-
-const {Title, Text} = Typography
-
-
+import Search from "antd/es/input/Search";
 export default function UtmPage() {
-    const {utmList, loading, contextHolder, createUtm, updateUtm} = useUtm()
+    const {utmList, fetchUtmList, loading, contextHolder, createUtm, updateUtm} = useUtm()
     const [isModalVisible, setIsModalVisible] = useState(false)
-    const [editingUtm, setEditingUtm] = useState<any>(null)
+    const [editingUtm, setEditingUtm] = useState<UtmParams | null>(null)
+    const [searchText, setSearchText] = useState('')
     const [form] = Form.useForm()
 
-    const showModal = (utm?: any) => {
+    const showModal = (utm?: UtmParams) => {
         if (utm) {
             setEditingUtm(utm)
             form.setFieldsValue(utm)
@@ -46,7 +44,7 @@ export default function UtmPage() {
         form.resetFields()
     }
 
-    const columns :TableProps<UtmParams>['columns'] = [
+    const columns: TableProps<UtmParams>['columns'] = [
         {
             title: 'Campaign',
             dataIndex: 'campaign',
@@ -76,7 +74,7 @@ export default function UtmPage() {
         {
             title: 'Action',
             key: 'action',
-            render: (_, record: any) => (
+            render: (_, record: UtmParams) => (
                 <Space size="middle">
                     <Button type="text" form={'form'} style={{color: '#7C3AED'}} icon={<CiEdit color={'#7C3AED'}/>}
                             onClick={() => showModal(record)}>Edit</Button>
@@ -84,32 +82,44 @@ export default function UtmPage() {
             ),
         },
     ]
+    useEffect(() => {
+        fetchUtmList()
+    }, [])
     return (
         <>
             {contextHolder}
             <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                    <Flex justify="space-between" align='center'>
-                        <Title level={2}>UTM Management</Title>
-                        <Button type="primary" form={'form'} icon={<PlusOutlined/>} onClick={() => showModal()}>
-                            Create New UTM
-                        </Button>
-                    </Flex>
-                </div>
-
-                {loading ? (
-                    <div className="flex justify-center">
-                        <Spin size="large"/>
-                    </div>
-                ) : (
-                    <Table
-                        columns={columns}
-                        dataSource={utmList}
-                        loading={loading}
-                        pagination={{pageSize: 10}}
-                        rowKey="key"
+                <Flex justify="space-between" align='center'>
+                    <Search
+                        placeholder="Search..."
+                        allowClear
+                        onChange={(e) => setSearchText(e.target.value)}
+                        style={{width: '40%'}}
                     />
-                )}
+                    <Button type="primary" form={'form'} icon={<PlusOutlined/>} onClick={() => showModal()}>
+                        UTM
+                    </Button>
+                </Flex>
+
+
+                <Table
+                    columns={columns}
+                    dataSource={utmList?.filter((utm: UtmParams) =>
+                        utm.campaign.toLowerCase().includes(searchText.toLowerCase()) ||
+                        utm.source.toLowerCase().includes(searchText.toLowerCase()) ||
+                        utm.medium.toLowerCase().includes(searchText.toLowerCase())
+
+                    )}
+                    loading={loading}
+                    pagination={{
+                        pageSize: 10,
+                        responsive: true,
+                        showSizeChanger: true,
+                        showQuickJumper: true,
+                    }}
+                    rowKey="key"
+                    scroll={{x: 'max-content'}}
+                />
                 <Modal
                     title={editingUtm ? "Edit UTM" : "Create New UTM"}
                     open={isModalVisible}
