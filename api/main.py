@@ -13,15 +13,10 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
-
-
-from core import engine
+from core import engine, RequestTimeMiddleware
 from models import Base
 
-limiter = Limiter(key_func=get_remote_address, default_limits=["45/minutes"])
-
 Base.metadata.create_all(bind=engine)
-
 app = FastAPI(
     title="TiaLinks API",
     version="0.1.0",
@@ -30,11 +25,11 @@ app = FastAPI(
     openapi_url="/api/openapi.json",
 )
 
+limiter = Limiter(key_func=get_remote_address, default_limits=["45/minutes"])
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
-
-
+app.add_middleware(RequestTimeMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
