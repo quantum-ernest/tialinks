@@ -1,0 +1,33 @@
+import {getToken, setUserObject} from "@/utils/auth";
+import {displayNotifications} from "@/utils/notifications";
+import {useState} from "react";
+
+const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
+export const useUser = () => {
+    const {contextHolder, openNotification} = displayNotifications()
+    const [loading, setLoading] = useState(false)
+
+    const updateUser = async (name: string ) => {
+        try {
+            setLoading(true)
+            const token = getToken()
+            const response = await fetch(apiUrl + '/api/users', {
+                method: 'PUT',
+                headers: {'Content-Type': 'application/json','Authorization': `Bearer ${token}`},
+                body: JSON.stringify({name: name})
+            })
+            if (!response.ok) {
+                throw new Error(response.statusText)
+            }
+            const userData = await response.json()
+            setUserObject(JSON.stringify(userData))
+            openNotification('success', "User name updated successfully.")
+        } catch (error) {
+            // @ts-ignore
+            openNotification('error', "Unable to update user data", error.message)
+        }finally {
+            setLoading(false)
+        }
+    }
+    return {loading, contextHolder, updateUser}
+}
