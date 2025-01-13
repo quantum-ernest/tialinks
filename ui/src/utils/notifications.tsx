@@ -9,6 +9,7 @@ export const displayNotifications = () => {
         api[type]({
             message: message,
             description: description,
+            duration: 3
         });
     };
     return {contextHolder, openNotification};
