@@ -8,8 +8,8 @@ import {
 } from 'recharts';
 import {useDashboard} from "@/hooks/Dashboard";
 
-const {Header, Content} = Layout;
-const {Title, Text} = Typography;
+const {Content} = Layout;
+const {Title} = Typography;
 import animatedClickIcon from "../../assets/icons/click-Animation.json";
 import animatedLinkIcon from "../../assets/icons/link-Animation.json";
 import animatedGraphIcon from "../../assets/icons/graph-Animation.json";
@@ -23,8 +23,8 @@ export default function Dashboard() {
     const {loading, dashboardData, fetchData, contextHolder} = useDashboard();
 
     useEffect(() => {
-        const isValid = checkAuth();
-        if (isValid) {
+        checkAuth();
+        if (isAuthenticated) {
             fetchData();
             const interval = setInterval(() => {
                 fetchData();
@@ -32,60 +32,38 @@ export default function Dashboard() {
             return () => clearInterval(interval);
         }
     }, []);
-
-    const peakClickDate = dashboardData?.monthly_click_trend[0]?.month;
-    let peakClickDay = ""
-    let peakClickMonth = ""
-    if (peakClickDate) {
-        const peakClickDateNew = new Date(peakClickDate?.split('.')[0]).toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true,
-        });
-        console.log(peakClickDateNew);
-        peakClickDay = peakClickDateNew.substring(0, 2);
-        peakClickMonth = peakClickDateNew.substring(peakClickDateNew.indexOf(' '), peakClickDateNew.indexOf(' ', peakClickDateNew.indexOf(' ') + 1))
-    }
     return (
         <>
             {contextHolder}
             {!isAuthenticated ? (<Spin size="large" fullscreen/>) :
                 <Layout>
-                    <Header style={{background: '#fff', padding: '0 20px'}}>
-                        <Title level={2}>Link Performance Dashboard</Title>
-                    </Header>
-                    <Content style={{padding: '20px'}}>
+                    <Content style={{padding: '16px'}}>
                         <Row gutter={[16, 16]}>
                             <Col span={24}>
                                 <Card>
-                                    <Row gutter={16}>
-                                        <Col span={8}>
+                                    <Row justify='center' gutter={[16, 16]}>
+                                        <Col xs={24} sm={24} md={8} lg={8} style={{display: 'flex', justifyContent: 'center'}}>
                                             <Statistic
                                                 title="Total Links"
                                                 prefix={<Lottie animationData={animatedLinkIcon}
-                                                                style={{height: '70px', width: '70px'}}/>}
+                                                                style={{height: '1.5em', width: '2em'}}/>}
                                                 value={dashboardData?.total_links}/>
                                         </Col>
-                                        <Col span={8}>
-
+                                        <Col xs={24} sm={24} md={8} lg={8} style={{display: 'flex', justifyContent: 'center'}}>
                                             <Statistic
                                                 title="Total Clicks"
                                                 value={dashboardData?.total_clicks}
                                                 prefix={<Lottie animationData={animatedClickIcon}
-                                                                style={{height: '70px', width: '70px'}}/>}
+                                                                style={{height: '1.5em', width: '2em'}}/>}
                                             />
                                         </Col>
-                                        <Col span={8}>
+                                        <Col xs={24} sm={24} md={8} lg={8} style={{display: 'flex', justifyContent: 'center'}}>
                                             <Statistic
                                                 title="Average Clicks per Link"
                                                 value={dashboardData?.average_clicks_per_link}
                                                 precision={2}
                                                 prefix={<Lottie animationData={animatedGraphIcon}
-                                                                style={{height: '70px', width: '70px'}}/>}
+                                                                style={{height: '1.5em', width: '2em'}}/>}
 
                                             />
                                         </Col>
@@ -95,7 +73,7 @@ export default function Dashboard() {
                         </Row>
 
                         <Row gutter={[16, 16]} style={{marginTop: '20px'}}>
-                            <Col span={12}>
+                            <Col xs={24} sm={24} md={12} lg={12}>
                                 <Card>
                                     <Title level={4}>Top Performing Links</Title>
                                     <ResponsiveContainer width="100%" height={300}>
@@ -110,7 +88,7 @@ export default function Dashboard() {
                                     </ResponsiveContainer>
                                 </Card>
                             </Col>
-                            <Col span={12}>
+                            <Col xs={24} sm={24} md={12} lg={12}>
                                 <Card>
                                     <Title level={4}>Traffic Sources</Title>
                                     <ResponsiveContainer width="100%" height={300}>
@@ -140,7 +118,7 @@ export default function Dashboard() {
                         </Row>
 
                         <Row gutter={[16, 16]} style={{marginTop: '20px'}}>
-                            <Col span={12}>
+                            <Col xs={24} sm={24} md={12} lg={12}>
                                 <Card>
                                     <Title level={4}>Top performing Campaigns</Title>
                                     <ResponsiveContainer width="100%" height={300}>
@@ -167,11 +145,13 @@ export default function Dashboard() {
                                     </ResponsiveContainer>
                                 </Card>
                             </Col>
-                            <Col span={12}>
+                            <Col xs={24} sm={24} md={12} lg={12}>
                                 <Card>
                                     <Title level={4}>Top Locations</Title>
                                     <Table
-                                        dataSource={dashboardData?.top_country}
+                                        dataSource={dashboardData?.top_country.slice(0,5)}
+                                        style={{height:325}}
+                                        loading={loading}
                                         columns={[
                                             {
                                                 title: 'Country',
@@ -210,7 +190,7 @@ export default function Dashboard() {
                         </Row>
 
                         <Row gutter={[16, 16]} style={{marginTop: '20px'}}>
-                            <Col span={12}>
+                            <Col xs={24} sm={24} md={12} lg={12}>
                                 <Card>
                                     <Title level={4}>Peak Click Times</Title>
                                     <ResponsiveContainer width="100%" height={300}>
@@ -225,17 +205,7 @@ export default function Dashboard() {
                                     </ResponsiveContainer>
                                 </Card>
                             </Col>
-                            <Col span={6}>
-                                <Card>
-                                    <Title level={4}>Peak Click Information</Title>
-                                    <Text strong>Peak Click Day: </Text>
-                                    <Text>{peakClickDay}</Text>
-                                    <br/>
-                                    <Text strong>Peak Click Month: </Text>
-                                    <Text>{peakClickMonth}</Text>
-                                </Card>
-                            </Col>
-                            <Col span={6}>
+                            <Col xs={24} sm={24} md={12} lg={12}>
                                 <Card>
                                     <Title level={4}>Clicks by Device</Title>
                                     <ResponsiveContainer width="100%" height={300}>
