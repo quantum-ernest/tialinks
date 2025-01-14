@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {
     QRCode,
     Select,
@@ -16,7 +16,7 @@ import {
     MinusOutlined,
     PlusOutlined
 } from '@ant-design/icons'
-import {useLinks} from "@/hooks/Links";
+import {LinkParams, useLinks} from "@/hooks/Links";
 import {displayNotifications} from "@/utils/notifications";
 
 const {Title, Text} = Typography
@@ -30,12 +30,12 @@ export default function QRCodeGenerator() {
     const [color, setColor] = useState<string>('#000000')
     const [bgColor, setBgColor] = useState<string>('#ffffff')
     const [renderType, setRenderType] = React.useState<QRCodeProps['type']>('canvas');
-    const [size, setSize] = useState<number>(160);
+    const [size, setSize] = useState<number>(220);
     const [level, setLevel] = useState<QRCodeProps['errorLevel']>('L');
     const {contextHolder} = displayNotifications()
-    const {linkData} = useLinks()
+    const {linkData, fetchLinks} = useLinks()
 
-    const [selectedLink, setSelectedLink] = useState()
+    const [selectedLink, setSelectedLink] = useState<LinkParams|null>(null)
 
     const increase = () => {
         setSize((prevSize) => {
@@ -57,11 +57,11 @@ export default function QRCodeGenerator() {
         });
     };
 
-    const handleColorOnChange = (value, css) => {
+    const handleColorOnChange = (value: { toHexString: () => React.SetStateAction<string>; }) => {
         setColor(value.toHexString());
     }
 
-    const handleBgColorOnChange = (value, css) => {
+    const handleBgColorOnChange = (value: { toHexString: () => React.SetStateAction<string>; }) => {
         setBgColor(value.toHexString());
     }
 
@@ -99,29 +99,32 @@ export default function QRCodeGenerator() {
         doDownload(url, 'QRCode.svg');
     };
 
+    useEffect(() => {
+        fetchLinks()
+    }, []);
     return (
         <>
             {contextHolder}
-            <Title level={4} style={{textAlign: 'center', margin: '50px'}}>Generate QR codes for your available
+            <Title level={4} style={{textAlign: 'center', marginBottom: '32px'}}>Generate QR codes for your available
                 links</Title>
-            <Row>
-                <Col span={8}>
+            <Row align='middle' justify='space-around'>
+                <Col xs={24} sm={24} md={12} lg={12}>
                     <Flex vertical gap='middle' justify='center'>
                         <Flex>
                             <Select
-                                style={{width: '50%', margin: 'auto'}}
-                                value={selectedLink?.id}
+                                style={{width: '100%', maxWidth: '300px', margin: 'auto'}}
+                                value={selectedLink?.generated_url}
                                 defaultValue='tialinks.com'
-                                onChange={(value) => setSelectedLink(linkData.find(link => link.id === value) || linkData[0])}
+                                onChange={(value) => setSelectedLink(linkData?.find(link => link.generated_url === value) || null)}
                             >
                                 {linkData?.map((link) => (
-                                    <Option key={link.id} value={link.id}>{link.shortcode}</Option>
+                                    <Option key={link.id} value={link.id}>{link.generated_url}</Option>
                                 ))}
                             </Select>
                         </Flex>
-                        <Flex vertical gap='middle' align='center' justify='center'>
+                        <Flex vertical gap='middle' align='center' justify='center' style={{marginBottom: '20px'}}>
                             <QRCode id='myqrcode'
-                                    value={selectedLink?.shortcode || 'tialinks.com'}
+                                    value={selectedLink?.generated_url || 'tialinks.com'}
                                     icon={logo}
                                     iconSize={logoSize}
                                     type={renderType}
@@ -132,19 +135,12 @@ export default function QRCodeGenerator() {
                                     size={size}
                                     style={{margin: "auto"}}
                             />
-                            <Button
-                                style={{width: '30%'}}
-                                icon={<DownloadOutlined/>}
-                                onClick={renderType === 'canvas' ? downloadCanvasQRCode : downloadSvgQRCode}
-                            >
-                                Download
-                            </Button>
                         </Flex>
 
                     </Flex>
                 </Col>
 
-                <Col span={16}>
+                <Col xs={24} sm={24} md={12} lg={12}>
                     <Flex vertical justify='end'>
                         <Flex align={'center'} gap='middle' style={{margin: 16}}>
                             <Text>QR Code size:</Text>
@@ -161,41 +157,75 @@ export default function QRCodeGenerator() {
                             <Text> Error level: </Text>
                             <Segmented options={['L', 'M', 'Q', 'H']} value={level} onChange={setLevel}/>
                         </Flex>
-                        <Flex align={'center'} gap='middle' style={{margin: 16}}>
-                            <Text>Color: </Text>
-                            <ColorPicker value={color} defaultValue="#000000" size="small" showText
-                                         onChange={handleColorOnChange}/>
-                            <Text>Background-color</Text>
-                            <ColorPicker value={bgColor} defaultValue="#000000" size="small" showText
-                                         onChange={handleBgColorOnChange}/>
+                        <Flex align={'center'} gap='middle'>
+                            <Row justify='start' style={{marginLeft: 16}}>
+                                <Col xs={24} sm={24} md={12} lg={12} style={{margin: '16px 0'}}>
+                                    <Flex align="center">
+                                        <Text style={{marginRight: 4, minWidth: '45px'}}>Color: </Text>
+                                        <ColorPicker value={color} defaultValue="#000000" size="small" showText
+                                                     onChange={handleColorOnChange}/>
+                                    </Flex>
+                                </Col>
+                                <Col xs={24} sm={24} md={12} lg={12} style={{margin: '16px 0'}}>
+                                    <Flex align="center">
+                                        <Text style={{marginLeft: 10, minWidth: '60px'}}>B-color:</Text>
+                                        <ColorPicker value={bgColor} defaultValue="#000000" size="small" showText
+                                                     onChange={handleBgColorOnChange}/>
+                                    </Flex>
+                                </Col>
+                            </Row>
                         </Flex>
-
-                        <Flex align={'center'} gap='middle' style={{margin: 16}}>
-                            <Upload
-                                accept="image/*"
-                                showUploadList={false}
-                                customRequest={({file, onSuccess}: any) => {
-                                    setTimeout(() => {
-                                        onSuccess("ok", file)
-                                    }, 0)
-                                }}
-                                onChange={handleLogoChange}
-                            >
-                                <Button icon={<UploadOutlined/>}>Upload Logo</Button>
-                            </Upload>
-                            <InputNumber
-                                min={30}
-                                max={50}
-                                value={logoSize}
-                                onChange={(value) => setLogoSize(value || 50)}
-                                addonBefore="Logo size"
-                                addonAfter="px"
-                            />
-
+                        <Flex align={'center'} gap='middle'>
+                            <Row justify='start' style={{marginLeft: 16}}>
+                                <Col xs={24} sm={24} md={12} lg={12} style={{margin: '16px 0'}}>
+                                    <Flex align="center">
+                                        <Text style={{marginRight: 4, minWidth: '45px'}}>Logo: </Text>
+                                        <Upload
+                                            accept="image/*"
+                                            showUploadList={false}
+                                            customRequest={({file, onSuccess}: any) => {
+                                                setTimeout(() => {
+                                                    onSuccess("ok", file)
+                                                }, 0)
+                                            }}
+                                            onChange={handleLogoChange}
+                                        >
+                                            <Button icon={<UploadOutlined/>}>Upload</Button>
+                                        </Upload>
+                                    </Flex>
+                                </Col>
+                                <Col xs={24} sm={24} md={12} lg={12} style={{margin: '16px 0px'}}>
+                                    <Flex align="center">
+                                        <Text style={{marginLeft: 10, minWidth: '45px'}}>Size:</Text>
+                                        <InputNumber
+                                        min={30}
+                                        max={50}
+                                        style={{width: 100 }}
+                                        value={logoSize}
+                                        onChange={(value) => setLogoSize(value || 50)}
+                                        addonAfter="px"
+                                    />
+                                    </Flex>
+                                </Col>
+                            </Row>
                         </Flex>
                     </Flex>
                 </Col>
             </Row>
+            <Flex align='end' justify='center' style={{
+                width: '100%',
+                height: 150,
+                borderRadius: 6,
+            }}>
+                <Button
+                    style={{width: '50%', maxWidth: '150px', padding: '10px'}}
+                    type='primary'
+                    icon={<DownloadOutlined/>}
+                    onClick={renderType === 'canvas' ? downloadCanvasQRCode : downloadSvgQRCode}
+                >
+                    Download
+                </Button>
+            </Flex>
         </>
     )
 }
