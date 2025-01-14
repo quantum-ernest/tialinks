@@ -5,6 +5,7 @@ const AnalyticsSchema = z.object({
   total_links: z.number(),
   top_performing_links: z.array(z.object({
     link_id: z.number(),
+    generated_url: z.string(),
     shortcode: z.string(),
     click_count: z.number(),
     original_url: z.string(),
@@ -63,5 +64,5 @@ const AnalyticsSchema = z.object({
 
 export type AnalyticsType = z.infer<typeof AnalyticsSchema>
 
-
+export  type TopPerformingLinks = AnalyticsType["top_performing_links"][number]
 export { AnalyticsSchema };
