@@ -3,7 +3,7 @@ import {displayNotifications} from "@/utils/notifications";
 import {getToken} from "@/utils/auth";
 import {useRouter} from "next/navigation";
 
-interface DashboardPrams {
+export interface DashboardPrams {
     total_links: number,
     total_clicks: number,
     average_clicks_per_link: number,
@@ -40,7 +40,7 @@ const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 export const useDashboard = () => {
     const {contextHolder, openNotification} = displayNotifications();
     const [loading, setLoading] = useState(false)
-    const [dashboardData, setDashboardData] = useState<DashboardPrams[] | null>(null)
+    const [dashboardData, setDashboardData] = useState<DashboardPrams | null>(null)
     const router = useRouter();
     const token = getToken()
     if (!token) {
@@ -60,7 +60,7 @@ export const useDashboard = () => {
             if (!response.ok) {
                 throw new Error(response.statusText)
             }
-            const data: DashboardPrams[] = await response.json()
+            const data: DashboardPrams = await response.json()
             setDashboardData(data)
             setLoading(false)
         } catch (error) {
