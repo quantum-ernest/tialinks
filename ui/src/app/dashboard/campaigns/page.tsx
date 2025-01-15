@@ -1,15 +1,22 @@
 'use client'
 import {useEffect, useState} from 'react'
-import {Button, Input, Modal, Form, Flex, Table, Space, Tag, TableProps} from 'antd'
+import {Button, Input, Modal, Form, Flex, Table, Space, Tag, TableProps, Spin} from 'antd'
 import {PlusOutlined} from '@ant-design/icons'
 import {useUtm} from '@/hooks/Utm'
 import {CiEdit} from "react-icons/ci";
 import {UtmParams} from '@/hooks/Utm'
 import Search from "antd/es/input/Search";
+import {useAuth} from "@/hooks/Auth";
+import {displayNotifications} from "@/utils/notifications";
+
 export default function UtmPage() {
-    const {utmList, fetchUtmList, loading, contextHolder, createUtm, updateUtm} = useUtm()
+    const {utmList, fetchUtmList, loading, createUtm, updateUtm} = useUtm()
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [editingUtm, setEditingUtm] = useState<UtmParams | null>(null)
+    const {checkAuth, isAuthenticated} = useAuth();
+    const {contextHolder, openNotification} = displayNotifications()
+
+
     const [searchText, setSearchText] = useState('')
     const [form] = Form.useForm()
 
@@ -83,73 +90,82 @@ export default function UtmPage() {
         },
     ]
     useEffect(() => {
-        fetchUtmList()
+        const _fetchData = async () => {
+            checkAuth();
+            if (isAuthenticated) {
+                await fetchUtmList()
+            }
+        }
+        _fetchData().catch(error => {
+            openNotification('error', error)
+        });
     }, [])
     return (
         <>
             {contextHolder}
-            <div className="space-y-6">
-                <Flex justify="space-between" align='center'>
-                    <Search
-                        placeholder="Search..."
-                        allowClear
-                        onChange={(e) => setSearchText(e.target.value)}
-                        style={{width: '40%'}}
+            {!isAuthenticated ? (<Spin size="large" fullscreen/>) : (
+                <div className="space-y-6">
+                    <Flex justify="space-between" align='center'>
+                        <Search
+                            placeholder="Search..."
+                            allowClear
+                            onChange={(e) => setSearchText(e.target.value)}
+                            style={{width: '40%'}}
+                        />
+                        <Button type="primary" form={'form'} icon={<PlusOutlined/>} onClick={() => showModal()}>
+                            UTM
+                        </Button>
+                    </Flex>
+
+
+                    <Table
+                        columns={columns}
+                        dataSource={utmList?.filter((utm: UtmParams) =>
+                            utm.campaign.toLowerCase().includes(searchText.toLowerCase()) ||
+                            utm.source.toLowerCase().includes(searchText.toLowerCase()) ||
+                            utm.medium.toLowerCase().includes(searchText.toLowerCase())
+                        )}
+                        loading={loading}
+                        pagination={{
+                            pageSize: 10,
+                            responsive: true,
+                            showSizeChanger: true,
+                            showQuickJumper: true,
+                        }}
+                        rowKey="key"
+                        scroll={{x: 'max-content'}}
                     />
-                    <Button type="primary" form={'form'} icon={<PlusOutlined/>} onClick={() => showModal()}>
-                        UTM
-                    </Button>
-                </Flex>
-
-
-                <Table
-                    columns={columns}
-                    dataSource={utmList?.filter((utm: UtmParams) =>
-                        utm.campaign.toLowerCase().includes(searchText.toLowerCase()) ||
-                        utm.source.toLowerCase().includes(searchText.toLowerCase()) ||
-                        utm.medium.toLowerCase().includes(searchText.toLowerCase())
-
-                    )}
-                    loading={loading}
-                    pagination={{
-                        pageSize: 10,
-                        responsive: true,
-                        showSizeChanger: true,
-                        showQuickJumper: true,
-                    }}
-                    rowKey="key"
-                    scroll={{x: 'max-content'}}
-                />
-                <Modal
-                    title={editingUtm ? "Edit UTM" : "Create New UTM"}
-                    open={isModalVisible}
-                    onOk={handleOk}
-                    onCancel={handleCancel}
-                >
-                    <Form form={form} layout="vertical" name="utm_form">
-                        <Form.Item
-                            name="campaign"
-                            label="Campaign"
-                            rules={[{required: true, message: 'Please input the campaign name!'}]}
-                        >
-                            <Input/>
-                        </Form.Item>
-                        <Form.Item
-                            name="source"
-                            label="Source"
-                            rules={[{required: true, message: 'Please input the source!'}]}
-                        >
-                            <Input/>
-                        </Form.Item>
-                        <Form.Item
-                            name="medium"
-                            label="Medium"
-                        >
-                            <Input/>
-                        </Form.Item>
-                    </Form>
-                </Modal>
-            </div>
+                    <Modal
+                        title={editingUtm ? "Edit UTM" : "Create New UTM"}
+                        open={isModalVisible}
+                        onOk={handleOk}
+                        onCancel={handleCancel}
+                    >
+                        <Form form={form} layout="vertical" name="utm_form">
+                            <Form.Item
+                                name="campaign"
+                                label="Campaign"
+                                rules={[{required: true, message: 'Please input the campaign name!'}]}
+                            >
+                                <Input/>
+                            </Form.Item>
+                            <Form.Item
+                                name="source"
+                                label="Source"
+                                rules={[{required: true, message: 'Please input the source!'}]}
+                            >
+                                <Input/>
+                            </Form.Item>
+                            <Form.Item
+                                name="medium"
+                                label="Medium"
+                            >
+                                <Input/>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+                </div>)
+            }
         </>
     )
 }

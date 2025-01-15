@@ -1,16 +1,18 @@
 'use client'
 
 import {useState, useEffect} from 'react'
-import {Table, Button, Input, Space, Tag, Modal, Form, Flex, Tooltip} from 'antd'
+import {Table, Button, Input, Space, Tag, Modal, Form, Flex, Tooltip, Spin} from 'antd'
 import {PlusOutlined} from '@ant-design/icons'
 import {SiSimpleanalytics} from "react-icons/si";
 import {LinkParams, useLinks} from "@/hooks/Links"
 import Image from "next/image";
+import {useAuth} from "@/hooks/Auth";
+import {displayNotifications} from "@/utils/notifications";
 
 const {Search} = Input
 
 export default function LinksPage() {
-    const {loading, linkData, fetchLinks, createLink, contextHolder, openNotification} = useLinks()
+    const {loading, linkData, fetchLinks, createLink} = useLinks()
     const [searchText, setSearchText] = useState('')
     const [form] = Form.useForm()
     const columns = [
@@ -39,7 +41,7 @@ export default function LinksPage() {
                             }}
                         />
                         <Tooltip placement="topLeft" title={original_url}>
-                            { original_url.length > 50? original_url.substring(0,50) + '...': original_url}
+                            {original_url.length > 50 ? original_url.substring(0, 50) + '...' : original_url}
                         </Tooltip>
                     </Flex>
                 </>
@@ -92,8 +94,10 @@ export default function LinksPage() {
             ),
         },
     ]
-
+    const {checkAuth, isAuthenticated} = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const {contextHolder, openNotification} = displayNotifications()
+
 
     const showModal = () => {
         setIsModalOpen(true);
@@ -117,57 +121,68 @@ export default function LinksPage() {
 
     };
     useEffect(() => {
-        fetchLinks()
+        const _fetchData = async () => {
+            checkAuth();
+            if (isAuthenticated) {
+                await fetchLinks()
+            }
+        }
+        _fetchData().catch(error => {
+            openNotification('error', error)
+        });
     }, [])
     return (
         <>
             {contextHolder}
-            <div className="space-y-4">
-                <Flex justify="space-between" align='center'>
-                    <Search
-                        placeholder="Search..."
-                        allowClear
-                        onChange={(e) => setSearchText(e.target.value)}
-                        style={{width: '40%'}}
+            {!isAuthenticated ? (<Spin size="large" fullscreen/>) : (
+                <div className="space-y-4">
+                    <Flex justify="space-between" align='center'>
+                        <Search
+                            placeholder="Search..."
+                            allowClear
+                            onChange={(e) => setSearchText(e.target.value)}
+                            style={{width: '40%'}}
+                        />
+                        <Button type="primary" icon={<PlusOutlined/>} onClick={showModal}>Link</Button>
+                    </Flex>
+                    <Table
+                        columns={columns}
+                        dataSource={linkData?.filter((link: LinkParams) =>
+                            link.original_url.toLowerCase().includes(searchText.toLowerCase()) ||
+                            link.shortcode.toLowerCase().includes(searchText.toLowerCase())
+                        )}
+                        loading={loading}
+                        pagination={{
+                            pageSize: 10,
+                            responsive: true,
+                            showSizeChanger: true,
+                            showQuickJumper: true,
+                        }}
+                        rowKey="key"
+                        scroll={{x: 'max-content'}}
+                        size="middle"
                     />
-                    <Button type="primary"  icon={<PlusOutlined/>} onClick={showModal}>Link</Button>
-                </Flex>
-                <Table
-                    columns={columns}
-                    dataSource={linkData?.filter((link: LinkParams) =>
-                        link.original_url.toLowerCase().includes(searchText.toLowerCase()) ||
-                        link.shortcode.toLowerCase().includes(searchText.toLowerCase())
-                    )}
-                    loading={loading}
-                    pagination={{
-                        pageSize: 10,
-                        responsive: true,
-                        showSizeChanger: true,
-                        showQuickJumper: true,
-                    }}
-                    rowKey="key"
-                    scroll={{x: 'max-content'}}
-                    size="middle"
-                />
 
-                <Modal
-                    title="Create New Link"
-                    open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
-                >
-                    <Form form={form} layout="vertical" name="create_link_form">
-                        <Form.Item
-                            name="url"
-                            label="URL to shorten"
-                            rules={[
-                                {required: true, message: 'Please input the URL to shorten!'},
-                                {type: 'url', message: 'Please enter a valid URL!'}
-                            ]}
-                        >
-                            <Input/>
-                        </Form.Item>
-                    </Form>
-                </Modal>
-            </div>
+                    <Modal
+                        title="Create New Link"
+                        open={isModalOpen} onOk={handleOk} onCancel={handleCancel}
+                    >
+                        <Form form={form} layout="vertical" name="create_link_form">
+                            <Form.Item
+                                name="url"
+                                label="URL to shorten"
+                                rules={[
+                                    {required: true, message: 'Please input the URL to shorten!'},
+                                    {type: 'url', message: 'Please enter a valid URL!'}
+                                ]}
+                            >
+                                <Input/>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
+                </div>
+            )
+            }
         </>
 
     )

@@ -16,22 +16,35 @@ import animatedGraphIcon from "../../assets/icons/graph-Animation.json";
 import Lottie from "lottie-react";
 import {useAuth} from "@/hooks/Auth";
 
+import {displayNotifications} from "@/utils/notifications";
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+
 
 export default function Dashboard() {
     const {checkAuth, isAuthenticated} = useAuth();
-    const {loading, dashboardData, fetchData, contextHolder} = useDashboard();
+    const {loading, dashboardData, fetchData} = useDashboard();
+    const {contextHolder, openNotification} = displayNotifications();
 
     useEffect(() => {
-        checkAuth();
-        if (isAuthenticated) {
-            fetchData();
-            const interval = setInterval(() => {
-                fetchData();
-            }, 5000);
-            return () => clearInterval(interval);
+        let interval: NodeJS.Timeout | null = null;
+        const _fetchData = async () => {
+            checkAuth();
+            if (isAuthenticated) {
+                await fetchData();
+                interval = setInterval( async () => {
+                    await fetchData();
+                }, 5000);
+            }
         }
-    }, []);
+        _fetchData().catch(error =>{
+            openNotification('error', error)
+        } );
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        }
+    }, [isAuthenticated]);
     return (
         <>
             {contextHolder}
@@ -42,14 +55,16 @@ export default function Dashboard() {
                             <Col span={24}>
                                 <Card>
                                     <Row justify='center' gutter={[16, 16]}>
-                                        <Col xs={24} sm={24} md={8} lg={8} style={{display: 'flex', justifyContent: 'center'}}>
+                                        <Col xs={24} sm={24} md={8} lg={8}
+                                             style={{display: 'flex', justifyContent: 'center'}}>
                                             <Statistic
                                                 title="Total Links"
                                                 prefix={<Lottie animationData={animatedLinkIcon}
                                                                 style={{height: '1.5em', width: '2em'}}/>}
                                                 value={dashboardData?.total_links}/>
                                         </Col>
-                                        <Col xs={24} sm={24} md={8} lg={8} style={{display: 'flex', justifyContent: 'center'}}>
+                                        <Col xs={24} sm={24} md={8} lg={8}
+                                             style={{display: 'flex', justifyContent: 'center'}}>
                                             <Statistic
                                                 title="Total Clicks"
                                                 value={dashboardData?.total_clicks}
@@ -57,7 +72,8 @@ export default function Dashboard() {
                                                                 style={{height: '1.5em', width: '2em'}}/>}
                                             />
                                         </Col>
-                                        <Col xs={24} sm={24} md={8} lg={8} style={{display: 'flex', justifyContent: 'center'}}>
+                                        <Col xs={24} sm={24} md={8} lg={8}
+                                             style={{display: 'flex', justifyContent: 'center'}}>
                                             <Statistic
                                                 title="Average Clicks per Link"
                                                 value={dashboardData?.average_clicks_per_link}
@@ -149,8 +165,8 @@ export default function Dashboard() {
                                 <Card>
                                     <Title level={4}>Top Locations</Title>
                                     <Table
-                                        dataSource={dashboardData?.top_country.slice(0,5)}
-                                        style={{height:325}}
+                                        dataSource={dashboardData?.top_country.slice(0, 5)}
+                                        style={{height: 325}}
                                         loading={loading}
                                         columns={[
                                             {

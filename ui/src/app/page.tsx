@@ -45,7 +45,7 @@ export default function Home() {
     const [shortUrl, setShortUrl] = useState<string | null>(null)
     const [copied, setCopied] = useState(false)
     const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
-    const {checkAuth, isAuthenticated} = useAuth();
+    const {checkAuth, isAuthenticated,setIsAuthenticated} = useAuth();
     const {createLink} = useLinks()
     const router = useRouter();
     const {contextHolder, openNotification} = displayNotifications();
@@ -97,6 +97,7 @@ export default function Home() {
                 router.push('/login')
                 break;
             case 'logout':
+                setIsAuthenticated(false);
                 logout()
                 router.push('/')
                 break;

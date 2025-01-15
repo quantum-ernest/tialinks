@@ -1,7 +1,7 @@
 'use client'
 
 import React, {useState, useEffect} from 'react';
-import {Layout, Row, Col, Card, Table, Typography, Select, DatePicker, Tabs, Statistic} from 'antd';
+import {Layout, Row, Col, Card, Table, Typography, Select, DatePicker, Tabs, Statistic, Spin} from 'antd';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     LineChart, Line, PieChart, Pie, Cell
@@ -11,7 +11,9 @@ import {useLinks} from "@/hooks/Links";
 import dayjs from 'dayjs';
 import GeographicalMap from "@/components/GeograhicalMap";
 import type {TabsProps} from 'antd';
-import {TopPerformingLinks} from "@/schemas/analytics";
+import {TopPerformingLinksType} from "@/schemas/analytics";
+import {useAuth} from "@/hooks/Auth";
+import {displayNotifications} from "@/utils/notifications";
 
 
 const {Content} = Layout;
@@ -24,20 +26,25 @@ const EnhancedAnalytics: React.FC = () => {
     const {linkData, fetchLinks} = useLinks();
     const [selectedLink, setSelectedLink] = useState<number | null>(null);
     const [dateRange, setDateRange] = useState<[string, string] | null>(null);
-    const {contextHolder, fetchAnalytics, loading, analyticsData, openNotification} = useAnalytics();
+    const {fetchAnalytics, loading, analyticsData} = useAnalytics();
+    const {checkAuth, isAuthenticated} = useAuth();
+    const {contextHolder, openNotification} = displayNotifications()
     const defaultStartDate = "2024-12-01T00:00:00"
     const defaultEndDate = dayjs(new Date().setFullYear(new Date().getFullYear() + 1)).format(dateFormat);
 
     useEffect(() => {
         const _fetchData = async () => {
-            const start_date = dateRange ? dateRange[0] : defaultStartDate;
-            const end_date = dateRange ? dateRange[1] : defaultEndDate;
-            if (selectedLink) {
-                await fetchAnalytics(start_date, end_date, selectedLink);
-            } else {
-                await fetchAnalytics(start_date, end_date);
+            checkAuth()
+            if (isAuthenticated) {
+                const start_date = dateRange ? dateRange[0] : defaultStartDate;
+                const end_date = dateRange ? dateRange[1] : defaultEndDate;
+                if (selectedLink) {
+                    await fetchAnalytics(start_date, end_date, selectedLink);
+                } else {
+                    await fetchAnalytics(start_date, end_date);
+                }
+                await fetchLinks()
             }
-            await fetchLinks()
         }
         _fetchData().catch((error) => {
             openNotification('error', error);
@@ -69,7 +76,7 @@ const EnhancedAnalytics: React.FC = () => {
             title: 'Clicks',
             dataIndex: 'click_count',
             key: 'click_count',
-            sorter: (a: TopPerformingLinks, b: TopPerformingLinks) => a.click_count - b.click_count,
+            sorter: (a: TopPerformingLinksType, b: TopPerformingLinksType) => a.click_count - b.click_count,
         },
         {title: 'Campaign', dataIndex: 'campaign', key: 'campaign'},
     ]
@@ -347,69 +354,72 @@ const EnhancedAnalytics: React.FC = () => {
     return (
         <>
             {contextHolder}
-            <Layout>
-                <Content style={{padding: '20px'}}>
-                    <Row gutter={[16, 16]}>
-                        <Col span={24}>
-                            <Card>
-                                <Row gutter={[16, 16]} justify='space-between'>
-                                    <Col xs={24} sm={24} md={8} lg={8}>
-                                        <Select
-                                            style={{width: '100%'}}
-                                            placeholder="Select a link"
-                                            onChange={(value) => setSelectedLink(value)}
-                                        >
-                                            {linkData?.map((link) => (
-                                                <Select.Option key={link.id} value={link.id}>
-                                                    {link.generated_url}
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
-                                    </Col>
-                                    <Col xs={24} sm={24} md={8} lg={8}>
-                                        <RangePicker
-                                            style={{width: '100%'}}
-                                            showNow
-                                            format={dateFormat}
-                                            minDate={dayjs('2024-12-01', dateFormat)}
-                                            onChange={(value, dateString) => {
-                                                setDateRange(dateString)
-                                            }}
-                                        />
-                                    </Col>
-                                </Row>
-                            </Card>
-                        </Col>
-                    </Row>
-                    <Row gutter={[16, 16]} style={{marginTop: '16px'}}>
-                        <Col xs={24} sm={24} md={6} lg={6}>
-                            <Card style={{display: "flex", justifyContent: 'center'}}>
-                                <Statistic title="Total Clicks" value={analyticsData?.total_clicks}/>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={24} md={6} lg={6}>
-                            <Card style={{display: "flex", justifyContent: 'center'}}>
-                                <Statistic title="Unique Links" value={analyticsData?.total_links}/>
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={24} md={6} lg={6}>
-                            <Card style={{display: "flex", justifyContent: 'center'}}>
-                                <Statistic
-                                    title="Average Clicks per Link"
-                                    value={analyticsData?.total_clicks} //Todo: change it to the actual value
-                                    precision={2}
-                                />
-                            </Card>
-                        </Col>
-                        <Col xs={24} sm={24} md={6} lg={6}>
-                            <Card style={{display: "flex", justifyContent: 'center'}}>
-                                <Statistic title="Active Campaigns" value={analyticsData?.referring_campaigns.length}/>
-                            </Card>
-                        </Col>
-                    </Row>
-                    <Tabs defaultActiveKey="1" style={{marginTop: '16px'}} items={tabItems}/>
-                </Content>
-            </Layout>
+            {!isAuthenticated ? (<Spin size="large" fullscreen/>) : (
+                <Layout>
+                    <Content style={{padding: '20px'}}>
+                        <Row gutter={[16, 16]}>
+                            <Col span={24}>
+                                <Card>
+                                    <Row gutter={[16, 16]} justify='space-between'>
+                                        <Col xs={24} sm={24} md={8} lg={8}>
+                                            <Select
+                                                style={{width: '100%'}}
+                                                placeholder="Select a link"
+                                                onChange={(value) => setSelectedLink(value)}
+                                            >
+                                                {linkData?.map((link) => (
+                                                    <Select.Option key={link.id} value={link.id}>
+                                                        {link.generated_url}
+                                                    </Select.Option>
+                                                ))}
+                                            </Select>
+                                        </Col>
+                                        <Col xs={24} sm={24} md={8} lg={8}>
+                                            <RangePicker
+                                                style={{width: '100%'}}
+                                                showNow
+                                                format={dateFormat}
+                                                minDate={dayjs('2024-12-01', dateFormat)}
+                                                onChange={(value, dateString) => {
+                                                    setDateRange(dateString)
+                                                }}
+                                            />
+                                        </Col>
+                                    </Row>
+                                </Card>
+                            </Col>
+                        </Row>
+                        <Row gutter={[16, 16]} style={{marginTop: '16px'}}>
+                            <Col xs={24} sm={24} md={6} lg={6}>
+                                <Card style={{display: "flex", justifyContent: 'center'}}>
+                                    <Statistic title="Total Clicks" value={analyticsData?.total_clicks}/>
+                                </Card>
+                            </Col>
+                            <Col xs={24} sm={24} md={6} lg={6}>
+                                <Card style={{display: "flex", justifyContent: 'center'}}>
+                                    <Statistic title="Unique Links" value={analyticsData?.total_links}/>
+                                </Card>
+                            </Col>
+                            <Col xs={24} sm={24} md={6} lg={6}>
+                                <Card style={{display: "flex", justifyContent: 'center'}}>
+                                    <Statistic
+                                        title="Average Clicks per Link"
+                                        value={analyticsData?.total_clicks} //Todo: change it to the actual value
+                                        precision={2}
+                                    />
+                                </Card>
+                            </Col>
+                            <Col xs={24} sm={24} md={6} lg={6}>
+                                <Card style={{display: "flex", justifyContent: 'center'}}>
+                                    <Statistic title="Active Campaigns"
+                                               value={analyticsData?.referring_campaigns.length}/>
+                                </Card>
+                            </Col>
+                        </Row>
+                        <Tabs defaultActiveKey="1" style={{marginTop: '16px'}} items={tabItems}/>
+                    </Content>
+                </Layout>)
+            }
         </>
 
     );

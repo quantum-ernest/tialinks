@@ -14,7 +14,10 @@ import {MdOutlineCampaign} from 'react-icons/md';
 import {ImQrcode} from 'react-icons/im';
 import {usePathname} from 'next/navigation';
 import Link from "next/link";
-import {getUserObject} from "@/utils/auth";
+import {getUserObject, logout} from "@/utils/auth";
+import {CiLogout} from "react-icons/ci";
+import {useRouter} from "next/navigation";
+import {useAuth} from "@/hooks/Auth";
 
 const {Header, Sider, Content} = Layout;
 const {Text} = Typography;
@@ -43,6 +46,9 @@ export default function DashboardLayout({
     const [collapsed, setCollapsed] = useState(false);
     const isSmallScreen = useMediaQuery('(max-width: 768px)');
     const pathname = usePathname();
+    const router = useRouter();
+    const {setIsAuthenticated} = useAuth();
+
 
     useEffect(() => {
         setCollapsed(isSmallScreen);
@@ -59,6 +65,12 @@ export default function DashboardLayout({
             setCollapsed(true);
         }
     };
+
+    const handleLogout = ()=>{
+        setIsAuthenticated(false);
+        logout()
+        router.push('/')
+    }
 
     const menuItems = [
         {
@@ -141,8 +153,21 @@ export default function DashboardLayout({
                     onClick={() => handleMenuClick()}
                     style={{borderRight: 0}}
                 />
+
+                <Button
+                    icon={<CiLogout/>}
+                    type='primary'
+                    onClick={handleLogout}
+                    style={{
+                        margin: 0,
+                        fontSize: '18px',
+                        marginTop: '50px',
+                        marginLeft: '16px'
+                    }}>
+                    {collapsed && !isSmallScreen ? '' : 'Logout'}
+                </Button>
             </Sider>
-            <Layout style={{ marginInlineStart: isSmallScreen? 'auto': !collapsed ? 190: 70 }}>
+            <Layout style={{marginInlineStart: isSmallScreen ? 'auto' : !collapsed ? 190 : 70}}>
                 <Header style={{
                     padding: '0 16px',
                     background: '#fff',
