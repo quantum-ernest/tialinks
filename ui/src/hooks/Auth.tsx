@@ -9,15 +9,15 @@ import {useLinks} from "@/hooks/Links";
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
 export const useAuth = () => {
-    const {contextHolder, openNotification} = displayNotifications()
+    const {openNotification} = displayNotifications()
     const [loading, setLoading] = useState<boolean>(false);
     const [step, setStep] = useState<'email' | 'otp'>('email');
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(isTokenValid());
     const router = useRouter();
     const {createLink} = useLinks();
     useEffect(() => {
         checkAuth();
-    }, []);
+    }, [isAuthenticated]);
 
     const checkAuth = () => {
         const isValidToken = isTokenValid();
@@ -27,7 +27,6 @@ export const useAuth = () => {
         }
         return isValidToken;
     };
-
 
     const requestOTP = async (email: string) => {
         try {
@@ -82,5 +81,5 @@ export const useAuth = () => {
         }
     }
 
-    return {step, setStep, contextHolder, checkAuth, openNotification, isAuthenticated, loading, submitOTP, requestOTP}
+    return {step, setStep, checkAuth, isAuthenticated,setIsAuthenticated, loading, submitOTP, requestOTP}
 }
