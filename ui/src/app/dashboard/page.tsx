@@ -22,8 +22,8 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 export default function Dashboard() {
     const {checkAuth, isAuthenticated} = useAuth();
-    const {loading, dashboardData, fetchData} = useDashboard();
-    const {contextHolder, openNotification} = displayNotifications();
+    const {loading, dashboardData, fetchData, contextHolder} = useDashboard();
+    const {openNotification} = displayNotifications();
 
     useEffect(() => {
         let interval: NodeJS.Timeout | null = null;
@@ -31,14 +31,14 @@ export default function Dashboard() {
             checkAuth();
             if (isAuthenticated) {
                 await fetchData();
-                interval = setInterval( async () => {
+                interval = setInterval(async () => {
                     await fetchData();
                 }, 5000);
             }
         }
-        _fetchData().catch(error =>{
+        _fetchData().catch(error => {
             openNotification('error', error)
-        } );
+        });
         return () => {
             if (interval) {
                 clearInterval(interval);

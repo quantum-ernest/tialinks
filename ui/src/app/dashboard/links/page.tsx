@@ -12,7 +12,7 @@ import {displayNotifications} from "@/utils/notifications";
 const {Search} = Input
 
 export default function LinksPage() {
-    const {loading, linkData, fetchLinks, createLink} = useLinks()
+    const {loading, linkData, fetchLinks, createLink, contextHolder} = useLinks()
     const [searchText, setSearchText] = useState('')
     const [form] = Form.useForm()
     const columns = [
@@ -96,7 +96,7 @@ export default function LinksPage() {
     ]
     const {checkAuth, isAuthenticated} = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const {contextHolder, openNotification} = displayNotifications()
+    const {openNotification} = displayNotifications()
 
 
     const showModal = () => {

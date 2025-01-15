@@ -1,6 +1,6 @@
 "use client"
 import React, {useState, useEffect} from 'react';
-import {Layout, Menu, Button, Avatar, Typography} from 'antd';
+import {Layout, Menu, Button, Avatar, Typography, Spin} from 'antd';
 import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
@@ -18,7 +18,6 @@ import {getUserObject, logout} from "@/utils/auth";
 import {CiLogout} from "react-icons/ci";
 import {useRouter} from "next/navigation";
 import {useAuth} from "@/hooks/Auth";
-
 const {Header, Sider, Content} = Layout;
 const {Text} = Typography;
 
@@ -38,21 +37,21 @@ function useMediaQuery(query: string): boolean {
     return matches;
 }
 
-export default function DashboardLayout({
-                                            children,
-                                        }: {
-    children: React.ReactNode
-}) {
+export default function DashboardLayout({children,}: { children: React.ReactNode }) {
     const [collapsed, setCollapsed] = useState(false);
+
     const isSmallScreen = useMediaQuery('(max-width: 768px)');
     const pathname = usePathname();
     const router = useRouter();
-    const {setIsAuthenticated} = useAuth();
-
-
+    const {isAuthenticated, checkAuth, setIsAuthenticated} = useAuth();
     useEffect(() => {
+        checkAuth();
+        if (!isAuthenticated) {
+            router.push("/login");
+            return;
+        }
         setCollapsed(isSmallScreen);
-    }, [isSmallScreen]);
+    }, [isSmallScreen, isAuthenticated]);
 
     const userObject = getUserObject()
     const userData = userObject ? JSON.parse(userObject) : null
@@ -66,7 +65,7 @@ export default function DashboardLayout({
         }
     };
 
-    const handleLogout = ()=>{
+    const handleLogout = () => {
         setIsAuthenticated(false);
         logout()
         router.push('/')
@@ -106,120 +105,124 @@ export default function DashboardLayout({
     ];
 
     return (
-        <Layout style={{minHeight: '100vh'}}>
-            <Sider
-                trigger={null}
-                collapsible
-                collapsed={collapsed}
-                breakpoint="md"
-                collapsedWidth={isSmallScreen ? 0 : 80}
-                style={{
-                    overflow: 'auto',
-                    position: 'fixed',
-                    insetInlineStart: 0,
-                    scrollbarWidth: 'thin',
-                    scrollbarGutter: 'stable',
-                    background: '#fff',
-                    left: 0,
-                    top: 0,
-                    bottom: 0,
-                    zIndex: 1001,
-                    transition: 'all 0.2s',
-                    boxShadow: isSmallScreen ? '2px 0 8px rgba(0,0,0,0.15)' : 'none',
-                }}
-                width={200}
-            >
-                <div style={{
-                    height: '64px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: '#7C3AED',
-                }}>
-                    <h1 style={{
-                        color: '#fff',
-                        margin: 0,
-                        fontSize: collapsed && !isSmallScreen ? '24px' : '28px',
-                        transition: 'all 0.2s',
-                    }}>
-                        {collapsed && !isSmallScreen ? 'TL' : 'TiaLinks'}
-                    </h1>
-                </div>
-                <Menu
-                    theme="light"
-                    mode="inline"
-                    selectedKeys={[pathname.split('/')[2] || 'dashboard']}
-                    items={menuItems}
-                    onClick={() => handleMenuClick()}
-                    style={{borderRight: 0}}
-                />
-
-                <Button
-                    icon={<CiLogout/>}
-                    type='primary'
-                    onClick={handleLogout}
-                    style={{
-                        margin: 0,
-                        fontSize: '18px',
-                        marginTop: '50px',
-                        marginLeft: '16px'
-                    }}>
-                    {collapsed && !isSmallScreen ? '' : 'Logout'}
-                </Button>
-            </Sider>
-            <Layout style={{marginInlineStart: isSmallScreen ? 'auto' : !collapsed ? 190 : 70}}>
-                <Header style={{
-                    padding: '0 16px',
-                    background: '#fff',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1000,
-                    width: '100%',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                }}>
-                    <Button
-                        type="text"
-                        icon={collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
-                        onClick={toggleSider}
+        <>
+            {!isAuthenticated ? (<Spin size="large" fullscreen/>) :
+                <Layout style={{minHeight: '100vh'}}>
+                    <Sider
+                        trigger={null}
+                        collapsible
+                        collapsed={collapsed}
+                        breakpoint="md"
+                        collapsedWidth={isSmallScreen ? 0 : 80}
                         style={{
-                            fontSize: '16px',
-                            width: 64,
-                            height: 64,
+                            overflow: 'auto',
+                            position: 'fixed',
+                            insetInlineStart: 0,
+                            scrollbarWidth: 'thin',
+                            scrollbarGutter: 'stable',
+                            background: '#fff',
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            zIndex: 1001,
+                            transition: 'all 0.2s',
+                            boxShadow: isSmallScreen ? '2px 0 8px rgba(0,0,0,0.15)' : 'none',
                         }}
-                    />
-                    <div style={{display: 'flex', alignItems: 'center'}}>
-                        <Avatar icon={<UserOutlined/>} style={{backgroundColor: '#7C3AED'}}/>
-                        <Text style={{marginLeft: 8}}>{userData ? userData?.name : userData?.email}</Text>
-                    </div>
-                </Header>
-                <Content style={{
-                    margin: '24px 16px',
-                    padding: 24,
-                    background: '#fff',
-                    borderRadius: 8,
-                    minHeight: 280,
-                }}>
-                    {children}
-                </Content>
-            </Layout>
-            {isSmallScreen && !collapsed && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'rgba(0, 0, 0, 0.45)',
-                        zIndex: 1000,
-                    }}
-                    onClick={toggleSider}
-                />
-            )}
-        </Layout>
+                        width={200}
+                    >
+                        <div style={{
+                            height: '64px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: '#7C3AED',
+                        }}>
+                            <h1 style={{
+                                color: '#fff',
+                                margin: 0,
+                                fontSize: collapsed && !isSmallScreen ? '24px' : '28px',
+                                transition: 'all 0.2s',
+                            }}>
+                                {collapsed && !isSmallScreen ? 'TL' : 'TiaLinks'}
+                            </h1>
+                        </div>
+                        <Menu
+                            theme="light"
+                            mode="inline"
+                            selectedKeys={[pathname.split('/')[2] || 'dashboard']}
+                            items={menuItems}
+                            onClick={() => handleMenuClick()}
+                            style={{borderRight: 0}}
+                        />
+
+                        <Button
+                            icon={<CiLogout/>}
+                            type='primary'
+                            onClick={handleLogout}
+                            style={{
+                                margin: 0,
+                                fontSize: '18px',
+                                marginTop: '50px',
+                                marginLeft: '16px'
+                            }}>
+                            {collapsed && !isSmallScreen ? '' : 'Logout'}
+                        </Button>
+                    </Sider>
+                    <Layout style={{marginInlineStart: isSmallScreen ? 'auto' : !collapsed ? 190 : 70}}>
+                        <Header style={{
+                            padding: '0 16px',
+                            background: '#fff',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            position: 'sticky',
+                            top: 0,
+                            zIndex: 1000,
+                            width: '100%',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                        }}>
+                            <Button
+                                type="text"
+                                icon={collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
+                                onClick={toggleSider}
+                                style={{
+                                    fontSize: '16px',
+                                    width: 64,
+                                    height: 64,
+                                }}
+                            />
+                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                <Avatar icon={<UserOutlined/>} style={{backgroundColor: '#7C3AED'}}/>
+                                <Text style={{marginLeft: 8}}>{userData ? userData?.name : userData?.email}</Text>
+                            </div>
+                        </Header>
+                        <Content style={{
+                            margin: '24px 16px',
+                            padding: 24,
+                            background: '#fff',
+                            borderRadius: 8,
+                            minHeight: 280,
+                        }}>
+                            {children}
+                        </Content>
+                    </Layout>
+                    {isSmallScreen && !collapsed && (
+                        <div
+                            style={{
+                                position: 'fixed',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                bottom: 0,
+                                background: 'rgba(0, 0, 0, 0.45)',
+                                zIndex: 1000,
+                            }}
+                            onClick={toggleSider}
+                        />
+                    )}
+                </Layout>
+            }
+        </>
     );
 }
 

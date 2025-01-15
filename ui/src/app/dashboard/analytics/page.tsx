@@ -26,9 +26,9 @@ const EnhancedAnalytics: React.FC = () => {
     const {linkData, fetchLinks} = useLinks();
     const [selectedLink, setSelectedLink] = useState<number | null>(null);
     const [dateRange, setDateRange] = useState<[string, string] | null>(null);
-    const {fetchAnalytics, loading, analyticsData} = useAnalytics();
+    const {fetchAnalytics, loading, analyticsData, contextHolder} = useAnalytics();
     const {checkAuth, isAuthenticated} = useAuth();
-    const {contextHolder, openNotification} = displayNotifications()
+    const {openNotification} = displayNotifications()
     const defaultStartDate = "2024-12-01T00:00:00"
     const defaultEndDate = dayjs(new Date().setFullYear(new Date().getFullYear() + 1)).format(dateFormat);
 

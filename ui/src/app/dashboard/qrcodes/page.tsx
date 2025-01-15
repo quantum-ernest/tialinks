@@ -34,8 +34,8 @@ export default function QRCodeGenerator() {
     const [renderType, setRenderType] = React.useState<QRCodeProps['type']>('canvas');
     const [size, setSize] = useState<number>(220);
     const [level, setLevel] = useState<QRCodeProps['errorLevel']>('L');
-    const {contextHolder, openNotification} = displayNotifications()
-    const {linkData, fetchLinks} = useLinks()
+    const {openNotification} = displayNotifications()
+    const {linkData, fetchLinks, contextHolder} = useLinks()
 
     const [selectedLink, setSelectedLink] = useState<LinkParams | null>(null)
 

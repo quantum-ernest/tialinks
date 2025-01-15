@@ -17,7 +17,7 @@ export default function SettingsPage() {
     }
     useEffect(() => {
         checkAuth()
-    })
+    }, [])
     return (
         <>
             {contextHolder}

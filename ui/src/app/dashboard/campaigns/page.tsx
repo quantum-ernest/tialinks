@@ -10,11 +10,11 @@ import {useAuth} from "@/hooks/Auth";
 import {displayNotifications} from "@/utils/notifications";
 
 export default function UtmPage() {
-    const {utmList, fetchUtmList, loading, createUtm, updateUtm} = useUtm()
+    const {utmList, fetchUtmList, loading, createUtm, updateUtm,contextHolder} = useUtm()
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [editingUtm, setEditingUtm] = useState<UtmParams | null>(null)
     const {checkAuth, isAuthenticated} = useAuth();
-    const {contextHolder, openNotification} = displayNotifications()
+    const {openNotification} = displayNotifications()
 
 
     const [searchText, setSearchText] = useState('')
