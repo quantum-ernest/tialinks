@@ -40,7 +40,7 @@ export const useDashboard = () => {
     const {openNotification, contextHolder} = displayNotifications();
     const [loading, setLoading] = useState(false)
     const [dashboardData, setDashboardData] = useState<DashboardPrams | null>(null)
-    const fetchData = async () => {
+    const fetchDashboardData = async () => {
         try {
             setLoading(true)
             const token = getToken()
@@ -62,5 +62,5 @@ export const useDashboard = () => {
 
         }
     }
-    return {loading, fetchData, contextHolder, dashboardData}
+    return {loading, fetchDashboardData, contextHolder, dashboardData}
 }

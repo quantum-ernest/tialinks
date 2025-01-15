@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Layout, Row, Col, Card, Table, Typography, Statistic, Spin} from 'antd';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
@@ -17,33 +17,39 @@ import Lottie from "lottie-react";
 import {useAuth} from "@/hooks/Auth";
 
 import {displayNotifications} from "@/utils/notifications";
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 
 export default function Dashboard() {
     const {checkAuth, isAuthenticated} = useAuth();
-    const {loading, dashboardData, fetchData, contextHolder} = useDashboard();
+    const {loading, dashboardData, fetchDashboardData, contextHolder} = useDashboard();
     const {openNotification} = displayNotifications();
 
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
     useEffect(() => {
-        let interval: NodeJS.Timeout | null = null;
-        const _fetchData = async () => {
+        const startFetchingData = async () => {
             checkAuth();
             if (isAuthenticated) {
-                await fetchData();
-                interval = setInterval(async () => {
-                    await fetchData();
-                }, 5000);
+                await fetchDashboardData();
+                if (!intervalRef.current) {
+                    intervalRef.current = setInterval(fetchDashboardData, 5000);
+                }
             }
-        }
-        _fetchData().catch(error => {
-            openNotification('error', error)
-        });
+        };
+
+        startFetchingData().catch(error => {
+                openNotification('error', error);
+            }
+        );
+
         return () => {
-            if (interval) {
-                clearInterval(interval);
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
             }
-        }
+        };
     }, [isAuthenticated]);
     return (
         <>
