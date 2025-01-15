@@ -137,14 +137,16 @@ export default function DashboardLayout({children,}: { children: React.ReactNode
                             justifyContent: 'center',
                             background: '#7C3AED',
                         }}>
-                            <h1 style={{
+                            <Link
+                                href='/'
+                                style={{
                                 color: '#fff',
                                 margin: 0,
                                 fontSize: collapsed && !isSmallScreen ? '24px' : '28px',
                                 transition: 'all 0.2s',
                             }}>
                                 {collapsed && !isSmallScreen ? 'TL' : 'TiaLinks'}
-                            </h1>
+                            </Link>
                         </div>
                         <Menu
                             theme="light"
