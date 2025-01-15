@@ -49,7 +49,7 @@ export default function GeographicalMap(geographicalData) {
         }
 
         fetchCoordinates()
-    }, [view])
+    }, [view, geographicalData])
 
     const maxClicks = Math.max(...data.map(d => d.click_count))
     const minClicks = Math.min(...data.map(d => d.click_count))
@@ -67,6 +67,7 @@ export default function GeographicalMap(geographicalData) {
     }
     return (
         <Card
+            style={{marginTop: 16}}
             title="Geographical Distribution of Clicks"
             extra={
                 <Select
