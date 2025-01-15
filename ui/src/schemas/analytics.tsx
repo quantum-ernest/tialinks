@@ -64,5 +64,6 @@ const AnalyticsSchema = z.object({
 
 export type AnalyticsType = z.infer<typeof AnalyticsSchema>
 
-export  type TopPerformingLinks = AnalyticsType["top_performing_links"][number]
+export  type TopPerformingLinksType = AnalyticsType["top_performing_links"][number]
+
 export { AnalyticsSchema };
