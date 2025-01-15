@@ -9,7 +9,7 @@ import {useLinks} from "@/hooks/Links";
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
 export const useAuth = () => {
-    const {openNotification} = displayNotifications()
+    const {openNotification, contextHolder} = displayNotifications()
     const [loading, setLoading] = useState<boolean>(false);
     const [step, setStep] = useState<'email' | 'otp'>('email');
     const [isAuthenticated, setIsAuthenticated] = useState(isTokenValid());
@@ -81,5 +81,5 @@ export const useAuth = () => {
         }
     }
 
-    return {step, setStep, checkAuth, isAuthenticated,setIsAuthenticated, loading, submitOTP, requestOTP}
+    return {step, setStep, checkAuth,contextHolder, isAuthenticated,setIsAuthenticated, loading, submitOTP, requestOTP}
 }

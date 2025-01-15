@@ -37,7 +37,7 @@ export interface DashboardPrams {
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 
 export const useDashboard = () => {
-    const {openNotification} = displayNotifications();
+    const {openNotification, contextHolder} = displayNotifications();
     const [loading, setLoading] = useState(false)
     const [dashboardData, setDashboardData] = useState<DashboardPrams | null>(null)
     const fetchData = async () => {
@@ -62,5 +62,5 @@ export const useDashboard = () => {
 
         }
     }
-    return {loading, fetchData, dashboardData}
+    return {loading, fetchData, contextHolder, dashboardData}
 }
