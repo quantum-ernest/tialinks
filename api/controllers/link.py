@@ -37,11 +37,18 @@ async def create(
             shortcode = new_shortcode
             break
     original_url = str(data.get("original_url"))
-    utm = UtmMapper.create_from_link(
-        session=session,
-        user_id=auth_user["user_id"],
-        data=original_url,
+    utm = (
+        UtmMapper.get_by_id(
+            session=session, pk_id=data.get("utm_id"), user_id=auth_user.get("user_id")
+        )
+        if data.get("utm_id")
+        else UtmMapper.create_from_link(
+            session=session,
+            user_id=auth_user["user_id"],
+            data=original_url,
+        )
     )
+
     favicon_url = build_favicon_url(original_url)
     base_url = (
         env.BASE_URL

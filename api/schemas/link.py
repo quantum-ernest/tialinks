@@ -7,6 +7,7 @@ from schemas import UserSchemaOut, UtmLinkSchemaOut
 
 class LinkSchemaIn(BaseModel):
     original_url: AnyUrl
+    utm_id: Optional[int] = None
 
 
 class LinkSchemaUpdate(BaseModel):
