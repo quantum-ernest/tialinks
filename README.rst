@@ -6,6 +6,15 @@
 TiaLinks is an open-source URL shortening and analytics tool that simplifies URL management while delivering valuable insights. Designed for developers and businesses, it helps you shorten links, track engagement, and analyze performance all in one place.
 
 
+
+   .. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+      :target: https://github.com/quantum-ernest/tialinks/blob/main/LICENSE
+   .. image:: https://img.shields.io/github/v/release/quantum-ernest/tialinks?color=%235351FB&label=version
+      :target: https://github.com/quantum-ernest/tialinks/releases
+   .. image:: https://img.shields.io/github/issues/quantum-ernest/tialinks
+      :target: https://github.com/quantum-ernest/tialinks/issues
+
+
 ✨ Current Features
 -------------------
 
@@ -33,7 +42,7 @@ TiaLinks is an open-source URL shortening and analytics tool that simplifies URL
 
 - 🔄 **Backend**: Built with FastAPI for high-performance API development.
 
-- ⚡ **Database**: Uses PostgreSQL for robust and reliable data storage.
+- ⚡ **Database**: Uses Timescale (PostgreSQL++) for fast and scalable data storage.
 
 - 🤑 **Cache**: Leverages Redis for efficient caching and quick data retrieval.
 
