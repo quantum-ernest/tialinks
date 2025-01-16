@@ -81,8 +81,15 @@ class LinkInteractionMapper(Base):
             cls.shortcode,
             cls.original_url,
             cls.campaign,
+            cls.generated_url,
             func.count().label("click_count"),
-        ).group_by(cls.link_id, cls.shortcode, cls.original_url, cls.campaign)
+        ).group_by(
+            cls.link_id,
+            cls.shortcode,
+            cls.original_url,
+            cls.campaign,
+            cls.generated_url,
+        )
         query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
         query = cls._base_group_by_clause(query)
         return cls._execute_query(session, query)
@@ -237,9 +244,9 @@ class LinkInteractionMapper(Base):
         end_date: datetime | None = None,
         link_id: int | None = None,
     ):
-        query = select(cls.continent, func.count().label("click_count")).group_by(
-            cls.continent
-        )
+        query = select(
+            cls.continent.label("name"), func.count().label("click_count")
+        ).group_by(cls.continent)
         query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
         query = cls._base_group_by_clause(query)
         return cls._execute_query(session, query)
@@ -253,9 +260,9 @@ class LinkInteractionMapper(Base):
         end_date: datetime | None = None,
         link_id: int | None = None,
     ):
-        query = select(cls.country, func.count().label("click_count")).group_by(
-            cls.country
-        )
+        query = select(
+            cls.country.label("name"), func.count().label("click_count")
+        ).group_by(cls.country)
         query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
         query = cls._base_group_by_clause(query)
         return cls._execute_query(session, query)
@@ -269,9 +276,9 @@ class LinkInteractionMapper(Base):
         end_date: datetime | None = None,
         link_id: int | None = None,
     ):
-        query = select(cls.region, func.count().label("click_count")).group_by(
-            cls.region
-        )
+        query = select(
+            cls.region.label("name"), func.count().label("click_count")
+        ).group_by(cls.region)
         query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
         query = cls._base_group_by_clause(query)
         return cls._execute_query(session, query)
@@ -285,7 +292,9 @@ class LinkInteractionMapper(Base):
         end_date: datetime | None = None,
         link_id: int | None = None,
     ):
-        query = select(cls.city, func.count().label("click_count")).group_by(cls.city)
+        query = select(
+            cls.city.label("name"), func.count().label("click_count")
+        ).group_by(cls.city)
         query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
         query = cls._base_group_by_clause(query)
         return cls._execute_query(session, query)
