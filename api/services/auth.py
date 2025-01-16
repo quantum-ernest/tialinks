@@ -34,9 +34,17 @@ class AuthService:
     @classmethod
     def decode_token(cls, token: str):
         try:
-            return jwt.decode(
+            decode_token = jwt.decode(
                 token, env.AUTH_SECRETE_KEY, algorithms=[env.AUTH_ALGORITHM]
             )
+            exp = decode_token.get("exp")
+            if exp and datetime.fromtimestamp(exp) > datetime.now():
+                return decode_token
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token is expired",
+                )
         except JWTError as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid Token: {e}"
