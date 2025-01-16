@@ -1,6 +1,5 @@
 import random
 import re
-from datetime import timedelta
 from typing import List
 
 import requests
@@ -82,19 +81,8 @@ def extract_utm_data(url: str) -> dict:
     return utm_data
 
 
-def ping_urls(links: List["LinkMapper"]) -> List["LinkMapper"]:
+def update_link_status(links: List["LinkMapper"]) -> List["LinkMapper"]:
     for link in links:
         status = redis_db.get(name=link.id)
-        if status:
-            link.status = status
-            continue
-        try:
-            response = requests.get(link.original_url, timeout=5)
-            if 200 <= response.status_code < 300:
-                link.status = "active"
-            else:
-                link.status = "inactive"
-        except Exception:
-            link.status = "inactive"
-        redis_db.setex(name=link.id, value=link.status, time=timedelta(minutes=25))
+        link.status = status if status else "inactive"
     return links

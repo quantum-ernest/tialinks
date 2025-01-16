@@ -5,7 +5,7 @@ from typing import List
 from models import LinkMapper, UtmMapper
 from schemas import LinkSchemaOut, LinkSchemaIn, LinkSchemaUpdate
 from services import IsAuthenticated
-from utils import generate_readable_short_code, build_favicon_url, ping_urls
+from utils import generate_readable_short_code, build_favicon_url, update_link_status
 
 router = APIRouter(prefix="/api/links", tags=["LINK"])
 
@@ -15,7 +15,7 @@ async def get_all(
     session: Session = Depends(get_db_session),
     auth_user: dict = Depends(IsAuthenticated()),
 ):
-    return ping_urls(LinkMapper.get_all(session, auth_user.get("user_id")))
+    return LinkMapper.get_all(session, auth_user.get("user_id"))
 
 
 @router.post("", response_model=LinkSchemaOut)
@@ -63,7 +63,7 @@ async def create(
             "user_id": auth_user.get("user_id"),
         }
     )
-    return ping_urls([LinkMapper.create(session=session, data=data)])[0]
+    return LinkMapper.create(session=session, data=data)
 
 
 @router.put("/{id}", response_model=LinkSchemaOut)
@@ -92,4 +92,4 @@ async def update(
             "id": id,
         }
     )
-    return ping_urls([LinkMapper.update(session, data=data)])[0]
+    return update_link_status([LinkMapper.update(session, data=data)])[0]

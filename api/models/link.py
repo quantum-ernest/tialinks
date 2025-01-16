@@ -7,6 +7,8 @@ from sqlalchemy import ForeignKey, select, func
 from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 from typing import Optional
 
+from utils import update_link_status
+
 
 class LinkMapper(Base):
     original_url: Mapped[str]
@@ -39,9 +41,10 @@ class LinkMapper(Base):
 
     @classmethod
     def get_all(cls, session: Session, user_id: int):
-        return session.scalars(
+        links = session.scalars(
             select(cls).where(cls.user_id == user_id).order_by(cls.id.desc())
         ).all()
+        return update_link_status(links)
 
     @classmethod
     def get_by_shortcode(cls, session: Session, shortcode: str):
