@@ -66,4 +66,6 @@ export type AnalyticsType = z.infer<typeof AnalyticsSchema>
 
 export  type TopPerformingLinksType = AnalyticsType["top_performing_links"][number]
 
+export type GeographicalDataType = AnalyticsType["geographical_data"] | null
+
 export { AnalyticsSchema };

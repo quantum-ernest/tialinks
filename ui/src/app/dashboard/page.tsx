@@ -14,7 +14,7 @@ import animatedClickIcon from "../../assets/icons/click-Animation.json";
 import animatedLinkIcon from "../../assets/icons/link-Animation.json";
 import animatedGraphIcon from "../../assets/icons/graph-Animation.json";
 import Lottie from "lottie-react";
-import {useAuth} from "@/hooks/Auth";
+import {useAuthContext} from "@/hooks/Auth";
 
 import {displayNotifications} from "@/utils/notifications";
 
@@ -22,14 +22,14 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 
 export default function Dashboard() {
-    const {checkAuth, isAuthenticated} = useAuth();
+    const {isAuthenticated, checkAuth} = useAuthContext();
     const {loading, dashboardData, fetchDashboardData, contextHolder} = useDashboard();
     const {openNotification} = displayNotifications();
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        const startFetchingData = async () => {
+        const _fetchData = async () => {
             checkAuth();
             if (isAuthenticated) {
                 await fetchDashboardData();
@@ -39,7 +39,7 @@ export default function Dashboard() {
             }
         };
 
-        startFetchingData().catch(error => {
+        _fetchData().catch(error => {
                 openNotification('error', error);
             }
         );

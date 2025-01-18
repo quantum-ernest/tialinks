@@ -7,13 +7,13 @@ export const useUser = () => {
     const {contextHolder, openNotification} = displayNotifications()
     const [loading, setLoading] = useState(false)
 
-    const updateUser = async (name: string ) => {
+    const updateUser = async (name: string) => {
         try {
             setLoading(true)
             const token = getToken()
             const response = await fetch(apiUrl + '/api/users', {
                 method: 'PUT',
-                headers: {'Content-Type': 'application/json','Authorization': `Bearer ${token}`},
+                headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${token}`},
                 body: JSON.stringify({name: name})
             })
             if (!response.ok) {
@@ -23,9 +23,13 @@ export const useUser = () => {
             setUserObject(JSON.stringify(userData))
             openNotification('success', "User name updated successfully.")
         } catch (error) {
-            // @ts-ignore
-            openNotification('error', "Unable to update user data", error.message)
-        }finally {
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
+        } finally {
             setLoading(false)
         }
     }

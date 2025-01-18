@@ -1,12 +1,12 @@
 'use client'
 
-import {useState, useEffect} from 'react'
+import {useState, useEffect, SyntheticEvent} from 'react'
 import {Table, Button, Input, Space, Tag, Modal, Form, Flex, Tooltip, Spin} from 'antd'
 import {PlusOutlined} from '@ant-design/icons'
 import {SiSimpleanalytics} from "react-icons/si";
 import {LinkParams, useLinks} from "@/hooks/Links"
 import Image from "next/image";
-import {useAuth} from "@/hooks/Auth";
+import {useAuthContext} from "@/hooks/Auth";
 import {displayNotifications} from "@/utils/notifications";
 
 const {Search} = Input
@@ -33,11 +33,10 @@ export default function LinksPage() {
                             height={20}
                             alt='favicon'
                             style={{marginRight: '5px'}}
-                            onError={(event) => {
-                                // @ts-ignore
-                                event.target.id = "/earth.png";
-                                // @ts-ignore
-                                event.target.srcset = "/earth.png";
+                            onError={(event: SyntheticEvent<HTMLImageElement, Event>) => {
+                                const target = event.target as HTMLImageElement;
+                                target.src = "/earth.png";
+                                target.srcset = "/earth.png";
                             }}
                         />
                         <Tooltip placement="topLeft" title={original_url}>
@@ -94,7 +93,7 @@ export default function LinksPage() {
             ),
         },
     ]
-    const {checkAuth, isAuthenticated} = useAuth();
+    const {checkAuth, isAuthenticated} = useAuthContext();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const {openNotification} = displayNotifications()
 
@@ -104,16 +103,21 @@ export default function LinksPage() {
     };
 
     const handleOk = async () => {
-        try {
-            const values = await form.validateFields()
-            await createLink(values.url)
-            form.resetFields()
-        } catch (error) {
-            // @ts-ignore
-            openNotification('error', error?.message)
+            try {
+                const values = await form.validateFields()
+                await createLink(values.url)
+                form.resetFields()
+            } catch (error) {
+                if (error instanceof Error) {
+                    openNotification('error', error?.message)
+                } else {
+                    openNotification('error', 'An unknown error occurred');
+                    console.error(error)
+                }
+            }
+            setIsModalOpen(false);
         }
-        setIsModalOpen(false);
-    };
+    ;
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -130,7 +134,7 @@ export default function LinksPage() {
         _fetchData().catch(error => {
             openNotification('error', error)
         });
-    }, [])
+    }, [isAuthenticated])
     return (
         <>
             {contextHolder}

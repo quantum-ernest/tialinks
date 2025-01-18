@@ -6,14 +6,14 @@ import {useUtm} from '@/hooks/Utm'
 import {CiEdit} from "react-icons/ci";
 import {UtmParams} from '@/hooks/Utm'
 import Search from "antd/es/input/Search";
-import {useAuth} from "@/hooks/Auth";
+import {useAuthContext} from "@/hooks/Auth";
 import {displayNotifications} from "@/utils/notifications";
 
 export default function UtmPage() {
     const {utmList, fetchUtmList, loading, createUtm, updateUtm,contextHolder} = useUtm()
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [editingUtm, setEditingUtm] = useState<UtmParams | null>(null)
-    const {checkAuth, isAuthenticated} = useAuth();
+    const {checkAuth, isAuthenticated} = useAuthContext();
     const {openNotification} = displayNotifications()
 
 
@@ -99,7 +99,7 @@ export default function UtmPage() {
         _fetchData().catch(error => {
             openNotification('error', error)
         });
-    }, [])
+    }, [isAuthenticated])
     return (
         <>
             {contextHolder}

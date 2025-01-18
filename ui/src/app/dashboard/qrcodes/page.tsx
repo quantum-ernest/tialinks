@@ -14,19 +14,27 @@ import {
     DownloadOutlined,
     UploadOutlined,
     MinusOutlined,
-    PlusOutlined
+    PlusOutlined, LoadingOutlined
 } from '@ant-design/icons'
+import type {UploadProps, GetProp} from 'antd';
 import {LinkParams, useLinks} from "@/hooks/Links";
 import {displayNotifications} from "@/utils/notifications";
-import {useAuth} from "@/hooks/Auth";
+import {useAuthContext} from "@/hooks/Auth";
 
 const {Title, Text} = Typography
 const {Option} = Select
-
+type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 const MIN_SIZE = 48;
 const MAX_SIZE = 300;
+
+const getBase64 = (img: FileType, callback: (url: string) => void) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result as string));
+    reader.readAsDataURL(img);
+};
+
 export default function QRCodeGenerator() {
-    const {checkAuth, isAuthenticated} = useAuth();
+    const {checkAuth, isAuthenticated} = useAuthContext();
     const [logoSize, setLogoSize] = useState<number>(40);
     const [logo, setLogo] = useState<string | undefined>()
     const [color, setColor] = useState<string>('#000000')
@@ -34,8 +42,9 @@ export default function QRCodeGenerator() {
     const [renderType, setRenderType] = React.useState<QRCodeProps['type']>('canvas');
     const [size, setSize] = useState<number>(220);
     const [level, setLevel] = useState<QRCodeProps['errorLevel']>('L');
-    const {openNotification} = displayNotifications()
-    const {linkData, fetchLinks, contextHolder} = useLinks()
+    const {openNotification, contextHolder} = displayNotifications()
+    const {linkData, fetchLinks} = useLinks()
+    const [loading, setLoading] = useState(false)
 
     const [selectedLink, setSelectedLink] = useState<LinkParams | null>(null)
 
@@ -66,11 +75,25 @@ export default function QRCodeGenerator() {
     const handleBgColorOnChange = (value: { toHexString: () => React.SetStateAction<string>; }) => {
         setBgColor(value.toHexString());
     }
-
-    const handleLogoChange = (info: any) => {
+    const beforeUpload = (file: FileType) => {
+        const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+        if (!isJpgOrPng) {
+            openNotification('error', 'You can only upload JPG/PNG file!');
+        }
+        const isLt2M = file.size / 1024 / 1024 < 2;
+        if (!isLt2M) {
+            openNotification('error','Image must smaller than 2MB!');
+        }
+        return isJpgOrPng && isLt2M;
+    };
+    const handleLogoChange: UploadProps['onChange'] = (info) => {
+        if (info.file.status === 'uploading') {
+            setLoading(true);
+        }
         if (info.file.status === 'done') {
-            getBase64(info.file.originFileObj, (imageUrl: string) => {
+            getBase64(info.file.originFileObj as FileType, (imageUrl: string) => {
                 setLogo(imageUrl)
+                setLoading(false);
             })
         }
     }
@@ -111,7 +134,7 @@ export default function QRCodeGenerator() {
         _fetchData().catch(error => {
             openNotification('error', error)
         });
-    }, []);
+    }, [isAuthenticated]);
     return (
         <>
             {contextHolder}
@@ -196,16 +219,13 @@ export default function QRCodeGenerator() {
                                             <Flex align="center">
                                                 <Text style={{marginRight: 4, minWidth: '45px'}}>Logo: </Text>
                                                 <Upload
+                                                    progress={{ strokeWidth: 2, showInfo: false }}
+                                                    beforeUpload={beforeUpload}
                                                     accept="image/*"
                                                     showUploadList={false}
-                                                    customRequest={({file, onSuccess}: any) => {
-                                                        setTimeout(() => {
-                                                            onSuccess("ok", file)
-                                                        }, 0)
-                                                    }}
                                                     onChange={handleLogoChange}
                                                 >
-                                                    <Button icon={<UploadOutlined/>}>Upload</Button>
+                                                    <Button>{loading ? <LoadingOutlined/> : <UploadOutlined/>}Image</Button>
                                                 </Upload>
                                             </Flex>
                                         </Col>
@@ -245,11 +265,4 @@ export default function QRCodeGenerator() {
             )}
         </>
     )
-}
-
-
-function getBase64(img: File, callback: (url: string) => void) {
-    const reader = new FileReader()
-    reader.addEventListener('load', () => callback(reader.result as string))
-    reader.readAsDataURL(img)
 }

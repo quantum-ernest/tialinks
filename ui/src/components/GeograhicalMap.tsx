@@ -4,14 +4,16 @@ import React, {useState, useEffect} from 'react'
 import {MapContainer, TileLayer, CircleMarker, Popup} from 'react-leaflet'
 import {Card, Select, Spin} from 'antd'
 import 'leaflet/dist/leaflet.css'
+import {GeographicalDataType} from "@/schemas/analytics";
 
+type Coordinate = [number, number];
 interface Location {
     name: string
     click_count: number
-    coordinates?: [number, number]
+    coordinates: Coordinate
 }
 
-async function geocode(locationName: string): Promise<[number, number] | null> {
+async function geocode(locationName: string): Promise<Coordinate> {
     try {
         const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`)
         const data = await response.json()
@@ -21,35 +23,37 @@ async function geocode(locationName: string): Promise<[number, number] | null> {
     } catch (error) {
         console.error('Geocoding error:', error)
     }
-    return null
+    return [0,0] as Coordinate
 }
 
-export default function GeographicalMap(geographicalData) {
-    const [view, setView] = useState("continents")
+export default function GeographicalMap({value}: { value: GeographicalDataType }) {
+    const [view, setView] = useState<'continents' | 'countries' | 'regions' | 'cities'>("continents")
     const [data, setData] = useState<Location[]>([])
     const [loading, setLoading] = useState(false)
 
     const GeoData = {
-        continents: geographicalData.geographicalData?.continents,
-        countries: geographicalData.geographicalData?.countries,
-        regions: geographicalData.geographicalData?.regions,
-        cities: geographicalData.geographicalData?.cities,
+        continents: value?.continents,
+        countries: value?.countries,
+        regions: value?.regions,
+        cities: value?.cities,
     };
     useEffect(() => {
         async function fetchCoordinates() {
             setLoading(true)
-            const newData = await Promise.all(
-                GeoData[view as keyof typeof GeoData].map(async (item) => {
-                    const coordinates = await geocode(item.name)
-                    return {...item, coordinates}
-                })
-            )
-            setData(newData.filter((item): item is Location => item.coordinates !== null))
-            setLoading(false)
+            if (GeoData[view]) {
+                const newData = await Promise.all(
+                    GeoData[view].map(async (item) => {
+                        const coordinates = item.name.toLowerCase() === 'unknown' ? [0,0] as Coordinate: await geocode(item.name)
+                        return {...item, coordinates}
+                    })
+                )
+                setData(newData)
+                setLoading(false)
+            }
         }
 
         fetchCoordinates()
-    }, [view, geographicalData])
+    }, [view, value])
 
     const maxClicks = Math.max(...data.map(d => d.click_count))
     const minClicks = Math.min(...data.map(d => d.click_count))

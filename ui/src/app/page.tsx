@@ -30,29 +30,27 @@ import '@/app/styles/custom.css'
 import {MdOutlineInsights} from "react-icons/md";
 import {GrSecure} from "react-icons/gr";
 import {TbBrandOpenSource} from "react-icons/tb";
-import {useAuth} from "@/hooks/Auth";
 import {useRouter} from "next/navigation";
 import {setPendingUrl} from "@/utils/pendingUrl";
 import {useLinks} from "@/hooks/Links";
 import {LinkParams} from "@/hooks/Links"
-import {logout} from "@/utils/auth";
 import {displayNotifications} from "@/utils/notifications";
+import {useAuthContext} from "@/hooks/Auth"
 
 const {Header, Content, Footer} = Layout
 const {Title, Paragraph, Text, Link} = Typography
 export default function Home() {
+    const {isAuthenticated, checkAuth, setIsAuthenticated, logout} = useAuthContext()
     const [url, setUrl] = useState<string | null>(null)
     const [shortUrl, setShortUrl] = useState<string | null>(null)
     const [copied, setCopied] = useState(false)
     const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
-    const {checkAuth, isAuthenticated,setIsAuthenticated} = useAuth();
     const {createLink} = useLinks()
     const router = useRouter();
     const {contextHolder, openNotification} = displayNotifications();
     const toggleMobileMenu = () => {
         setMobileMenuVisible(!mobileMenuVisible);
     };
-
     const handleCopy = () => {
         if (shortUrl) {
             navigator.clipboard.writeText(shortUrl)
@@ -62,7 +60,7 @@ export default function Home() {
     }
     useEffect(() => {
         checkAuth();
-    }, [])
+    }, [isAuthenticated])
 
     const handleShorten = async () => {
         if (isAuthenticated && url) {
@@ -72,8 +70,13 @@ export default function Home() {
                     setShortUrl(newLink.generated_url)
                 }
             } catch (error) {
-                // @ts-ignore
-                openNotification('error', "Unable to create link", error.message)
+                if (error instanceof Error) {
+
+                    openNotification('error', error.message)
+                } else {
+                    openNotification('error', "Unknown error occurred")
+                    console.log(error)
+                }
             }
         } else {
             if (url) {
@@ -97,9 +100,8 @@ export default function Home() {
                 router.push('/login')
                 break;
             case 'logout':
-                setIsAuthenticated(false);
                 logout()
-                router.push('/')
+                setIsAuthenticated(false);
                 break;
             default:
                 break;
@@ -484,7 +486,8 @@ export default function Home() {
                         <Divider style={{borderColor: '#E5E7EB'}}/>
                         <Row justify="space-between" align="middle">
                             <Col xs={24} sm={12} style={{textAlign: 'center'}}>
-                                <Text style={{color: '#6B7280'}}>Built with ❤️ by the open-source community.</Text>
+                                <a href="https://github.com/quantum-ernest/" target="_blank" style={{color: '#6B7280'}}>Built
+                                    with ❤️ by Ernest Kwabena Asare.</a>
                             </Col>
                             <Col xs={24} sm={12}>
                                 <Text style={{color: '#6B7280'}}>© 2024 TiaLinks. All rights reserved.</Text>

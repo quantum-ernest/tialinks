@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useState} from 'react'
 import {displayNotifications} from '../utils/notifications'
 import {getToken} from "@/utils/auth";
 
@@ -12,12 +12,12 @@ export interface UtmParams {
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 export const useUtm = () => {
-    const {contextHolder,openNotification} = displayNotifications()
-    const [utmList, setUtmList] = useState<UtmParams[]|null>(null)
+    const {contextHolder, openNotification} = displayNotifications()
+    const [utmList, setUtmList] = useState<UtmParams[] | null>(null)
     const [loading, setLoading] = useState(true)
     const fetchUtmList = async () => {
         try {
-        setLoading(true)
+            setLoading(true)
             const token = getToken()
             const response = await fetch(apiUrl + '/api/utms', {
                 headers: {
@@ -31,8 +31,12 @@ export const useUtm = () => {
             const data: UtmParams[] = await response.json()
             setUtmList(data)
         } catch (error) {
-            // @ts-ignore
-            openNotification("error", "Failed to fetch UTM list", error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
         } finally {
             setLoading(false)
         }
@@ -56,8 +60,12 @@ export const useUtm = () => {
             setUtmList([newUtm, ...utmList ?? []])
             openNotification("success", "UTM created successfully")
         } catch (error) {
-            // @ts-ignore
-            openNotification("error", "Failed to create UTM", error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
 
         }
     }
@@ -79,8 +87,12 @@ export const useUtm = () => {
             const updatedUtm = await response.json()
             setUtmList((utmList ?? []).map(utm => utm.id === id ? updatedUtm : utm))
         } catch (error) {
-            // @ts-ignore
-            openNotification("error", 'Failed to update UTM', error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
 
         }
     }

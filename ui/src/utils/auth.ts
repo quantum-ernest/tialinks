@@ -37,6 +37,7 @@ export const removeToken = () => {
 
 export const logout = () => {
     removeToken();
+
 }
 export const isTokenValid = (): boolean => {
     const token = getToken();

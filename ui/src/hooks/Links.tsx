@@ -46,8 +46,12 @@ export const useLinks = () => {
             }))
             setLinkData(formattedData)
         } catch (error) {
-            // @ts-ignore
-            openNotification('error', "Unable to fetch links.", error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
         } finally {
             setLoading(false)
         }
@@ -72,8 +76,12 @@ export const useLinks = () => {
             setLinkData((prevData) => (prevData ? [newLink, ...prevData] : [newLink]));
             return newLink
         } catch (error) {
-            // @ts-ignore
-            openNotification('error', "Unable to create links.", error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
         } finally {
             setLoading(false)
         }

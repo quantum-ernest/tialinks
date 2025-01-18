@@ -1,7 +1,7 @@
 "use client"
-import {useEffect, useState} from "react";
+import React, {useContext, useState, createContext} from "react";
 import {displayNotifications} from "@/utils/notifications";
-import {isTokenValid, removeToken, setToken, setUserObject} from "@/utils/auth";
+import {isTokenValid, logout, removeToken, setToken, setUserObject} from "@/utils/auth";
 import {useRouter} from "next/navigation";
 import {getPendingUrl} from "@/utils/pendingUrl";
 import {useLinks} from "@/hooks/Links";
@@ -10,24 +10,11 @@ const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
 export const useAuth = () => {
     const {openNotification, contextHolder} = displayNotifications()
+    const {isAuthenticated, setIsAuthenticated} = useAuthContext()
     const [loading, setLoading] = useState<boolean>(false);
     const [step, setStep] = useState<'email' | 'otp'>('email');
-    const [isAuthenticated, setIsAuthenticated] = useState(isTokenValid());
     const router = useRouter();
     const {createLink} = useLinks();
-    useEffect(() => {
-        checkAuth();
-    }, [isAuthenticated]);
-
-    const checkAuth = () => {
-        const isValidToken = isTokenValid();
-        setIsAuthenticated(isValidToken);
-        if (!isValidToken) {
-            removeToken();
-        }
-        return isValidToken;
-    };
-
     const requestOTP = async (email: string) => {
         try {
             setLoading(true);
@@ -43,8 +30,12 @@ export const useAuth = () => {
             }
             setStep('otp');
         } catch (error) {
-            // @ts-ignore
-            openNotification('error', error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
         } finally {
             setLoading(false)
         }
@@ -74,12 +65,64 @@ export const useAuth = () => {
             }
             router.push('/dashboard');
         } catch (error) {
-            // @ts-ignore
-            openNotification('error', error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
         } finally {
             setLoading(false)
         }
     }
 
-    return {step, setStep, checkAuth,contextHolder, isAuthenticated,setIsAuthenticated, loading, submitOTP, requestOTP}
+    return {
+        step,
+        setStep,
+        contextHolder,
+        isAuthenticated,
+        setIsAuthenticated,
+        loading,
+        submitOTP,
+        requestOTP
+    }
 }
+
+type AuthContextType = {
+    isAuthenticated: boolean;
+    setIsAuthenticated: (isAuthenticated: boolean) => void;
+    checkAuth: () => void;
+    logout: () => void;
+}
+
+const defaultAuthContext: AuthContextType = {
+    isAuthenticated: false,
+    checkAuth: () => {},
+    setIsAuthenticated: () => {},
+    logout: () => {},
+};
+
+export const AuthContext = createContext(defaultAuthContext);
+
+export const AuthProvider = ({children,}: { children: React.ReactNode }) => {
+    const [isAuthenticated, setIsAuthenticated] = useState(isTokenValid());
+
+    const checkAuth = () => {
+        const isValidToken = isTokenValid();
+
+        if (isAuthenticated !== isValidToken) {
+            setIsAuthenticated(isValidToken);
+            if (!isValidToken) {
+                removeToken();
+            }
+        }
+        return isValidToken;
+    };
+    return (
+        <AuthContext.Provider value={{ isAuthenticated, checkAuth, setIsAuthenticated, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
+
+export const useAuthContext = () => useContext(AuthContext);

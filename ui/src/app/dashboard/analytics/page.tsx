@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 import GeographicalMap from "@/components/GeograhicalMap";
 import type {TabsProps} from 'antd';
 import {TopPerformingLinksType} from "@/schemas/analytics";
-import {useAuth} from "@/hooks/Auth";
+import {useAuthContext} from "@/hooks/Auth";
 import {displayNotifications} from "@/utils/notifications";
 
 
@@ -27,17 +27,14 @@ const EnhancedAnalytics: React.FC = () => {
     const [selectedLink, setSelectedLink] = useState<number | null>(null);
     const [dateRange, setDateRange] = useState<[string, string] | null>(null);
     const {fetchAnalytics, loading, analyticsData, contextHolder} = useAnalytics();
-    const {checkAuth, isAuthenticated} = useAuth();
+    const {checkAuth, isAuthenticated} = useAuthContext();
     const {openNotification} = displayNotifications()
-    const defaultStartDate = "2024-12-01T00:00:00"
-    const defaultEndDate = dayjs(new Date().setFullYear(new Date().getFullYear() + 1)).format(dateFormat);
-
     useEffect(() => {
         const _fetchData = async () => {
             checkAuth()
             if (isAuthenticated) {
-                const start_date = dateRange ? dateRange[0] : defaultStartDate;
-                const end_date = dateRange ? dateRange[1] : defaultEndDate;
+                const start_date = dateRange ? dateRange[0] : "2024-12-01T00:00:00";
+                const end_date = dateRange ? dateRange[1] : dayjs(new Date().setFullYear(new Date().getFullYear() + 1)).format(dateFormat);
                 if (selectedLink) {
                     await fetchAnalytics(start_date, end_date, selectedLink);
                 } else {
@@ -49,7 +46,7 @@ const EnhancedAnalytics: React.FC = () => {
         _fetchData().catch((error) => {
             openNotification('error', error);
         });
-    }, [selectedLink, dateRange]);
+    }, [selectedLink, dateRange, isAuthenticated]);
 
     const topPerformingColumns = [
         {
@@ -347,7 +344,7 @@ const EnhancedAnalytics: React.FC = () => {
                         </Card>
                     </Col>
                 </Row>
-                <GeographicalMap geographicalData={analyticsData?.geographical_data}/>
+                <GeographicalMap value={analyticsData?.geographical_data ?? null}/>
             </>
         }
     ]

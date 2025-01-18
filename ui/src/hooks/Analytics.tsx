@@ -32,8 +32,12 @@ export const useAnalytics = () => {
             setAnalyticsData(data)
             setLoading(false)
         } catch (error) {
-            // @ts-expect-error
-            openNotification("error", "Unable to get analytics data", error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
         } finally {
             setLoading(false)
         }

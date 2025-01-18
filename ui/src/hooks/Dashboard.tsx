@@ -55,8 +55,12 @@ export const useDashboard = () => {
             setDashboardData(data)
             setLoading(false)
         } catch (error) {
-            // @ts-ignore
-            openNotification("error", "Unable to get dashboard data", error.message)
+            if (error instanceof Error) {
+                openNotification('error', error.message)
+            } else {
+                openNotification('error', "Unknown error occurred")
+                console.log(error)
+            }
         } finally {
             setLoading(false)
 

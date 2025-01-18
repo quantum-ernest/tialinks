@@ -82,7 +82,7 @@ export default function LoginPage() {
                                         <Button onClick={() => {
                                             setStep('email')
                                         }}>Change Email</Button>
-                                        <Button onClick={handleEmailSubmit}>
+                                        <Button loading={loading} onClick={handleEmailSubmit}>
                                             Request New OTP
                                         </Button>
                                     </Flex>

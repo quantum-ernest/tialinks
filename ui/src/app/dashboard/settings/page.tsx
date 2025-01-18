@@ -4,10 +4,10 @@ import {useEffect} from 'react'
 import {Card, Form, Input, Button, Row, Col, Spin} from 'antd'
 import {getUserObject} from "@/utils/auth";
 import {useUser} from "@/hooks/User";
-import {useAuth} from "@/hooks/Auth";
+import {useAuthContext} from "@/hooks/Auth";
 
 export default function SettingsPage() {
-    const {checkAuth, isAuthenticated} = useAuth();
+    const {checkAuth, isAuthenticated} = useAuthContext();
     const [form] = Form.useForm()
     const {contextHolder, updateUser, loading} = useUser()
     const user = getUserObject()
@@ -17,7 +17,7 @@ export default function SettingsPage() {
     }
     useEffect(() => {
         checkAuth()
-    }, [])
+    }, [isAuthenticated])
     return (
         <>
             {contextHolder}

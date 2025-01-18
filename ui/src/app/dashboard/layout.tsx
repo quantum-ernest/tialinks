@@ -14,10 +14,10 @@ import {MdOutlineCampaign} from 'react-icons/md';
 import {ImQrcode} from 'react-icons/im';
 import {usePathname} from 'next/navigation';
 import Link from "next/link";
-import {getUserObject, logout} from "@/utils/auth";
+import {getUserObject} from "@/utils/auth";
 import {CiLogout} from "react-icons/ci";
 import {useRouter} from "next/navigation";
-import {useAuth} from "@/hooks/Auth";
+import {useAuthContext} from "@/hooks/Auth";
 const {Header, Sider, Content} = Layout;
 const {Text} = Typography;
 
@@ -43,7 +43,7 @@ export default function DashboardLayout({children,}: { children: React.ReactNode
     const isSmallScreen = useMediaQuery('(max-width: 768px)');
     const pathname = usePathname();
     const router = useRouter();
-    const {isAuthenticated, checkAuth, setIsAuthenticated} = useAuth();
+    const {isAuthenticated, checkAuth, setIsAuthenticated, logout} = useAuthContext();
     useEffect(() => {
         checkAuth();
         if (!isAuthenticated) {
@@ -51,7 +51,7 @@ export default function DashboardLayout({children,}: { children: React.ReactNode
             return;
         }
         setCollapsed(isSmallScreen);
-    }, [isSmallScreen, isAuthenticated]);
+    }, [isSmallScreen, isAuthenticated, checkAuth, router]);
 
     const userObject = getUserObject()
     const userData = userObject ? JSON.parse(userObject) : null
