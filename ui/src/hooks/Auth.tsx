@@ -1,6 +1,6 @@
 "use client"
 import React, {useContext, useState, createContext} from "react";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 import {isTokenValid, logout, removeToken, setToken, setUserObject} from "@/utils/auth";
 import {useRouter} from "next/navigation";
 import {getPendingUrl} from "@/utils/pendingUrl";
@@ -9,7 +9,7 @@ import {useLinks} from "@/hooks/Links";
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
 export const useAuth = () => {
-    const {openNotification, contextHolder} = displayNotifications()
+    const {openNotification} = useNotification()
     const {isAuthenticated, setIsAuthenticated} = useAuthContext()
     const [loading, setLoading] = useState<boolean>(false);
     const [step, setStep] = useState<'email' | 'otp'>('email');
@@ -31,7 +31,8 @@ export const useAuth = () => {
             setStep('otp');
         } catch (error) {
             if (error instanceof Error) {
-                openNotification('error', error.message)
+                alert(error.message);
+                openNotification('error', error.message, 'saaaaa')
             } else {
                 openNotification('error', "Unknown error occurred")
                 console.log(error)
@@ -79,7 +80,6 @@ export const useAuth = () => {
     return {
         step,
         setStep,
-        contextHolder,
         isAuthenticated,
         setIsAuthenticated,
         loading,

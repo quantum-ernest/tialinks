@@ -7,12 +7,12 @@ import {SiSimpleanalytics} from "react-icons/si";
 import {LinkParams, useLinks} from "@/hooks/Links"
 import Image from "next/image";
 import {useAuthContext} from "@/hooks/Auth";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 
 const {Search} = Input
 
 export default function LinksPage() {
-    const {loading, linkData, fetchLinks, createLink, contextHolder} = useLinks()
+    const {loading, linkData, fetchLinks, createLink} = useLinks()
     const [searchText, setSearchText] = useState('')
     const [form] = Form.useForm()
     const columns = [
@@ -95,7 +95,7 @@ export default function LinksPage() {
     ]
     const {checkAuth, isAuthenticated} = useAuthContext();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const {openNotification} = displayNotifications()
+    const {openNotification} = useNotification()
 
 
     const showModal = () => {
@@ -137,7 +137,6 @@ export default function LinksPage() {
     }, [isAuthenticated])
     return (
         <>
-            {contextHolder}
             {!isAuthenticated ? (<Spin size="large" fullscreen/>) : (
                 <div className="space-y-4">
                     <Flex justify="space-between" align='center'>

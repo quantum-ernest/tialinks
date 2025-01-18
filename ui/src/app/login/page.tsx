@@ -6,7 +6,7 @@ import {MailOutlined} from '@ant-design/icons'
 import {InputOTP} from 'antd-input-otp';
 import '../styles/login.css'
 import {useAuth} from "@/hooks/Auth";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 
 const {Title} = Typography
 type OTP = string[] | null
@@ -14,8 +14,8 @@ type OTP = string[] | null
 export default function LoginPage() {
     const [form] = Form.useForm();
     const [email, setEmail] = useState('');
-    const {step, setStep, loading, contextHolder, submitOTP, requestOTP} = useAuth();
-    const {openNotification} = displayNotifications();
+    const {step, setStep, loading, submitOTP, requestOTP} = useAuth();
+    const {openNotification} = useNotification();
     const handleEmailSubmit = async () => {
         await requestOTP(email)
     }
@@ -31,7 +31,6 @@ export default function LoginPage() {
 
     return (
         <>
-            {contextHolder}
             <div className="login-container">
                 <Card className="login-card">
                     <div className="login-header">

@@ -16,15 +16,15 @@ import animatedGraphIcon from "../../assets/icons/graph-Animation.json";
 import Lottie from "lottie-react";
 import {useAuthContext} from "@/hooks/Auth";
 
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
 
 export default function Dashboard() {
     const {isAuthenticated, checkAuth} = useAuthContext();
-    const {loading, dashboardData, fetchDashboardData, contextHolder} = useDashboard();
-    const {openNotification} = displayNotifications();
+    const {loading, dashboardData, fetchDashboardData} = useDashboard();
+    const {openNotification} = useNotification();
 
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -53,7 +53,6 @@ export default function Dashboard() {
     }, [isAuthenticated]);
     return (
         <>
-            {contextHolder}
             {!isAuthenticated ? (<Spin size="large" fullscreen/>) :
                 <Layout>
                     <Content style={{padding: '16px'}}>

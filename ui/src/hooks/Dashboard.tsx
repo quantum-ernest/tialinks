@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 import {getToken} from "@/utils/auth";
 
 export interface DashboardPrams {
@@ -37,7 +37,7 @@ export interface DashboardPrams {
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 
 export const useDashboard = () => {
-    const {openNotification, contextHolder} = displayNotifications();
+    const {openNotification} = useNotification();
     const [loading, setLoading] = useState(false)
     const [dashboardData, setDashboardData] = useState<DashboardPrams | null>(null)
     const fetchDashboardData = async () => {
@@ -66,5 +66,5 @@ export const useDashboard = () => {
 
         }
     }
-    return {loading, fetchDashboardData, contextHolder, dashboardData}
+    return {loading, fetchDashboardData, dashboardData}
 }

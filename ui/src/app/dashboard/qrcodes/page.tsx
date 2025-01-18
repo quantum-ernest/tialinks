@@ -18,7 +18,7 @@ import {
 } from '@ant-design/icons'
 import type {UploadProps, GetProp} from 'antd';
 import {LinkParams, useLinks} from "@/hooks/Links";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 import {useAuthContext} from "@/hooks/Auth";
 
 const {Title, Text} = Typography
@@ -42,7 +42,7 @@ export default function QRCodeGenerator() {
     const [renderType, setRenderType] = React.useState<QRCodeProps['type']>('canvas');
     const [size, setSize] = useState<number>(220);
     const [level, setLevel] = useState<QRCodeProps['errorLevel']>('L');
-    const {openNotification, contextHolder} = displayNotifications()
+    const {openNotification} = useNotification()
     const {linkData, fetchLinks} = useLinks()
     const [loading, setLoading] = useState(false)
 
@@ -137,7 +137,6 @@ export default function QRCodeGenerator() {
     }, [isAuthenticated]);
     return (
         <>
-            {contextHolder}
             {!isAuthenticated ? (<Spin size="large" fullscreen/>) : (
                 <>
                     <Title level={4} style={{textAlign: 'center', marginBottom: '32px'}}>Generate QR codes for your

@@ -34,7 +34,7 @@ import {useRouter} from "next/navigation";
 import {setPendingUrl} from "@/utils/pendingUrl";
 import {useLinks} from "@/hooks/Links";
 import {LinkParams} from "@/hooks/Links"
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 import {useAuthContext} from "@/hooks/Auth"
 
 const {Header, Content, Footer} = Layout
@@ -47,7 +47,7 @@ export default function Home() {
     const [mobileMenuVisible, setMobileMenuVisible] = useState(false);
     const {createLink} = useLinks()
     const router = useRouter();
-    const {contextHolder, openNotification} = displayNotifications();
+    const {openNotification} = useNotification();
     const toggleMobileMenu = () => {
         setMobileMenuVisible(!mobileMenuVisible);
     };
@@ -125,7 +125,6 @@ export default function Home() {
 
     return (
         <>
-            {contextHolder}
             <Layout>
                 <Header className="tialinks-header">
                     <Row justify="space-between" align="middle" style={{height: '100%'}}>

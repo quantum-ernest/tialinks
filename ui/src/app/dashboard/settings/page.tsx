@@ -9,7 +9,7 @@ import {useAuthContext} from "@/hooks/Auth";
 export default function SettingsPage() {
     const {checkAuth, isAuthenticated} = useAuthContext();
     const [form] = Form.useForm()
-    const {contextHolder, updateUser, loading} = useUser()
+    const { updateUser, loading} = useUser()
     const user = getUserObject()
     const userData = user ? JSON.parse(user) : null
     const onFinish = async ({name}: { name: string }) => {
@@ -20,7 +20,6 @@ export default function SettingsPage() {
     }, [isAuthenticated])
     return (
         <>
-            {contextHolder}
             {!isAuthenticated ? (<Spin size="large" fullscreen/>) :
                 <Row>
                     <Col xs={24} sm={12} md={12} lg={12}>

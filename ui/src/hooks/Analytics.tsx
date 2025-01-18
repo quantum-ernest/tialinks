@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 import {AnalyticsSchema, AnalyticsType} from "@/schemas/analytics";
 import {getToken} from "@/utils/auth";
 import dayjs from "dayjs";
@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 
 export const useAnalytics = () => {
-    const {openNotification, contextHolder} = displayNotifications()
+    const {openNotification} = useNotification()
     const [loading, setLoading] = useState(false)
     const [analyticsData, setAnalyticsData] = useState<AnalyticsType | null>(null)
     const fetchAnalytics = async (start_date: string, end_date: string, link_id: number | null = null,) => {
@@ -42,6 +42,6 @@ export const useAnalytics = () => {
             setLoading(false)
         }
     }
-    return {fetchAnalytics, analyticsData, loading, contextHolder, openNotification}
+    return {fetchAnalytics, analyticsData, loading, openNotification}
 
 }

@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {displayNotifications} from '../utils/notifications'
+import {useNotification} from '../utils/notifications'
 import {getToken} from "@/utils/auth";
 
 export interface UtmParams {
@@ -12,7 +12,7 @@ export interface UtmParams {
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 export const useUtm = () => {
-    const {contextHolder, openNotification} = displayNotifications()
+    const { openNotification} = useNotification()
     const [utmList, setUtmList] = useState<UtmParams[] | null>(null)
     const [loading, setLoading] = useState(true)
     const fetchUtmList = async () => {
@@ -96,5 +96,5 @@ export const useUtm = () => {
 
         }
     }
-    return {utmList, loading, contextHolder, fetchUtmList, createUtm, updateUtm}
+    return {utmList, loading, fetchUtmList, createUtm, updateUtm}
 }

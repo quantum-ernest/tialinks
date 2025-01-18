@@ -1,10 +1,10 @@
 import {getToken, setUserObject} from "@/utils/auth";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 import {useState} from "react";
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
 export const useUser = () => {
-    const {contextHolder, openNotification} = displayNotifications()
+    const { openNotification} = useNotification()
     const [loading, setLoading] = useState(false)
 
     const updateUser = async (name: string) => {
@@ -33,5 +33,5 @@ export const useUser = () => {
             setLoading(false)
         }
     }
-    return {loading, contextHolder, updateUser}
+    return {loading, updateUser}
 }

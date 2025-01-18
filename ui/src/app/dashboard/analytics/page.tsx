@@ -13,7 +13,7 @@ import GeographicalMap from "@/components/GeograhicalMap";
 import type {TabsProps} from 'antd';
 import {TopPerformingLinksType} from "@/schemas/analytics";
 import {useAuthContext} from "@/hooks/Auth";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 
 
 const {Content} = Layout;
@@ -26,9 +26,9 @@ const EnhancedAnalytics: React.FC = () => {
     const {linkData, fetchLinks} = useLinks();
     const [selectedLink, setSelectedLink] = useState<number | null>(null);
     const [dateRange, setDateRange] = useState<[string, string] | null>(null);
-    const {fetchAnalytics, loading, analyticsData, contextHolder} = useAnalytics();
+    const {fetchAnalytics, loading, analyticsData} = useAnalytics();
     const {checkAuth, isAuthenticated} = useAuthContext();
-    const {openNotification} = displayNotifications()
+    const {openNotification} = useNotification()
     useEffect(() => {
         const _fetchData = async () => {
             checkAuth()
@@ -350,7 +350,6 @@ const EnhancedAnalytics: React.FC = () => {
     ]
     return (
         <>
-            {contextHolder}
             {!isAuthenticated ? (<Spin size="large" fullscreen/>) : (
                 <Layout>
                     <Content style={{padding: '20px'}}>

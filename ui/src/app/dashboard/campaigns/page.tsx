@@ -7,14 +7,14 @@ import {CiEdit} from "react-icons/ci";
 import {UtmParams} from '@/hooks/Utm'
 import Search from "antd/es/input/Search";
 import {useAuthContext} from "@/hooks/Auth";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 
 export default function UtmPage() {
-    const {utmList, fetchUtmList, loading, createUtm, updateUtm,contextHolder} = useUtm()
+    const {utmList, fetchUtmList, loading, createUtm, updateUtm} = useUtm()
     const [isModalVisible, setIsModalVisible] = useState(false)
     const [editingUtm, setEditingUtm] = useState<UtmParams | null>(null)
     const {checkAuth, isAuthenticated} = useAuthContext();
-    const {openNotification} = displayNotifications()
+    const {openNotification} = useNotification()
 
 
     const [searchText, setSearchText] = useState('')
@@ -102,7 +102,6 @@ export default function UtmPage() {
     }, [isAuthenticated])
     return (
         <>
-            {contextHolder}
             {!isAuthenticated ? (<Spin size="large" fullscreen/>) : (
                 <div className="space-y-6">
                     <Flex justify="space-between" align='center'>

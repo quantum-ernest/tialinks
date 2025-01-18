@@ -1,5 +1,3 @@
-"use client"
-
 export const setPendingUrl = (pendingUrl: string) => {
     if (typeof window !== 'undefined') {
         localStorage.setItem('pendingUrl', pendingUrl);

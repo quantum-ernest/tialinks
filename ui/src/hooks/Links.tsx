@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {displayNotifications} from "@/utils/notifications";
+import {useNotification} from "@/utils/notifications";
 import {getToken} from "@/utils/auth";
 
 export interface LinkParams {
@@ -14,7 +14,7 @@ export interface LinkParams {
 }
 
 export const useLinks = () => {
-    const {openNotification, contextHolder} = displayNotifications()
+    const {openNotification} = useNotification()
     const [loading, setLoading] = useState(false)
     const [linkData, setLinkData] = useState<LinkParams[] | null>(null)
     const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL
@@ -86,5 +86,5 @@ export const useLinks = () => {
             setLoading(false)
         }
     }
-    return {loading, contextHolder, linkData, fetchLinks, createLink, openNotification}
+    return {loading, linkData, fetchLinks, createLink, openNotification}
 }
