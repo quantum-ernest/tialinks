@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useEffect, SyntheticEvent } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import {
-  Table,
   Button,
-  Input,
-  Space,
-  Tag,
-  Modal,
-  Form,
+  DatePicker,
   Flex,
-  Tooltip,
+  Form,
+  Input,
+  Modal,
+  Select,
+  Space,
   Spin,
+  Table,
+  Tag,
+  Tooltip,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { SiSimpleanalytics } from "react-icons/si";
@@ -19,13 +21,24 @@ import { LinkParams, useLinks } from "@/hooks/Links";
 import Image from "next/image";
 import { useAuthContext } from "@/hooks/Auth";
 import { useNotification } from "@/utils/notifications";
+import { useUtm } from "@/hooks/Utm";
+import dayjs from "dayjs";
 
 const { Search } = Input;
+const { Option } = Select;
 
 export default function LinksPage() {
   const { loading, linkData, fetchLinks, createLink } = useLinks();
+  const { utmList, fetchUtmList } = useUtm();
+  const [selectedUtm, setSelectedUtm] = useState<number | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
+
+  const filteredLinkData = linkData?.map((link) => ({
+    ...link,
+    campaign: link.utm?.campaign,
+  }));
   const columns = [
     {
       title: "Original URL",
@@ -70,9 +83,9 @@ export default function LinksPage() {
       ),
     },
     {
-      title: "Short Code",
-      dataIndex: "shortcode",
-      key: "shortcode",
+      title: "Campaign",
+      dataIndex: "campaign",
+      key: "campaign",
     },
     {
       title: "Clicks",
@@ -96,7 +109,6 @@ export default function LinksPage() {
     {
       title: "Action",
       key: "action",
-      // fixed: 'right',
       render: () => (
         <Space size="middle">
           <Button type="link" icon={<SiSimpleanalytics color={"#7C3AED"} />}>
@@ -117,13 +129,13 @@ export default function LinksPage() {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      await createLink(values.url);
+      await createLink(values.url, selectedUtm, expiresAt);
       form.resetFields();
     } catch (error) {
       if (error instanceof Error) {
         openNotification("error", error?.message);
       } else {
-        openNotification("error", "An unknown error occurred");
+        openNotification("error", "Invalid Form Input");
         console.error(error);
       }
     }
@@ -138,6 +150,7 @@ export default function LinksPage() {
       checkAuth();
       if (isAuthenticated) {
         await fetchLinks();
+        await fetchUtmList();
       }
     };
     _fetchData().catch((error) => {
@@ -163,7 +176,7 @@ export default function LinksPage() {
           </Flex>
           <Table
             columns={columns}
-            dataSource={linkData?.filter(
+            dataSource={filteredLinkData?.filter(
               (link: LinkParams) =>
                 link.original_url
                   .toLowerCase()
@@ -201,6 +214,32 @@ export default function LinksPage() {
                 ]}
               >
                 <Input />
+              </Form.Item>
+              <Form.Item>
+                <Select
+                  style={{ margin: "auto" }}
+                  allowClear={true}
+                  defaultValue={null}
+                  onChange={(value) => setSelectedUtm(value)}
+                >
+                  {utmList?.map((utm) => (
+                    <Option key={utm.id} value={utm.id}>
+                      {utm.campaign}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+              <Form.Item>
+                <DatePicker
+                  style={{ width: "100%" }}
+                  format="YYYY-MM-DDTHH:mm:ss"
+                  showTime
+                  minDate={dayjs(Date(), "YYYY-MM-DDTHH:mm:ss")}
+                  onChange={(date, dateString) =>
+                    setExpiresAt(dateString as string)
+                  }
+                  needConfirm
+                />
               </Form.Item>
             </Form>
           </Modal>

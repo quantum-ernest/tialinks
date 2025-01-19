@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNotification } from "@/utils/notifications";
 import { getToken } from "@/utils/auth";
+import { UtmParams } from "@/hooks/Utm";
 
 export interface LinkParams {
   id: number;
@@ -11,6 +12,7 @@ export interface LinkParams {
   created_at: string;
   favicon_url: string;
   status: string;
+  utm: UtmParams | null;
 }
 
 export const useLinks = () => {
@@ -62,7 +64,11 @@ export const useLinks = () => {
     }
   };
 
-  const createLink = async (originalUrl: string) => {
+  const createLink = async (
+    originalUrl: string,
+    utm_id: number | null,
+    expires_at: string | null,
+  ) => {
     try {
       setLoading(true);
       const token = getToken();
@@ -72,7 +78,11 @@ export const useLinks = () => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ original_url: originalUrl }),
+        body: JSON.stringify({
+          original_url: originalUrl,
+          utm_id: utm_id,
+          expires_at: expires_at,
+        }),
       });
       if (!response.ok) {
         throw new Error(response.statusText);
