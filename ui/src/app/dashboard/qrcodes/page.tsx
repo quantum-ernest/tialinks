@@ -82,7 +82,7 @@ export default function QRCodeGenerator() {
         }
         const isLt2M = file.size / 1024 / 1024 < 2;
         if (!isLt2M) {
-            openNotification('error','Image must smaller than 2MB!');
+            openNotification('error', 'Image must smaller than 2MB!');
         }
         return isJpgOrPng && isLt2M;
     };
@@ -108,21 +108,52 @@ export default function QRCodeGenerator() {
     }
 
     const downloadCanvasQRCode = () => {
-        const canvas = document.getElementById('myqrcode')?.querySelector<HTMLCanvasElement>('canvas');
-        if (canvas) {
-            const url = canvas.toDataURL();
-            doDownload(url, 'QRCode.png');
+        const originalCanvas = document.getElementById('myqrcode')?.querySelector<HTMLCanvasElement>('canvas');
+        if (!originalCanvas) {
+            return;
         }
+        const padding = 20;
+        const paddedCanvas = document.createElement('canvas');
+        paddedCanvas.width = originalCanvas.width + padding * 2;
+        paddedCanvas.height = originalCanvas.height + padding * 2;
+        const ctx = paddedCanvas.getContext('2d')!;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
+        ctx.drawImage(originalCanvas, padding, padding);
+        const url = paddedCanvas.toDataURL();
+        doDownload(url, 'QRCode.png');
     };
 
-    const downloadSvgQRCode = () => {
-        const svg = document.getElementById('myqrcode')?.querySelector<SVGElement>('svg');
-        const svgData = new XMLSerializer().serializeToString(svg!);
-        const blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'});
+const downloadSvgQRCode = () => {
+    const svg = document.getElementById('myqrcode')?.querySelector<SVGElement>('svg');
+
+    if (svg) {
+        const padding = 20;
+        const width = svg.clientWidth + padding * 2;
+        const height = svg.clientHeight + padding * 2;
+        const paddedSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        paddedSvg.setAttribute('width', String(width));
+        paddedSvg.setAttribute('height', String(height));
+        paddedSvg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        paddedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        const paddingRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        paddingRect.setAttribute('width', String(width));
+        paddingRect.setAttribute('height', String(height));
+        paddingRect.setAttribute('fill', 'white');
+        paddedSvg.appendChild(paddingRect);
+        const originalSvg = svg.cloneNode(true) as SVGElement;
+        originalSvg.setAttribute('x', String(padding));
+        originalSvg.setAttribute('y', String(padding));
+        paddedSvg.appendChild(originalSvg);
+        const svgData = new XMLSerializer().serializeToString(paddedSvg);
+        const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
         const url = URL.createObjectURL(blob);
-
         doDownload(url, 'QRCode.svg');
-    };
+    }
+};
+
+
+
 
     useEffect(() => {
         const _fetchData = async () => {
@@ -218,13 +249,14 @@ export default function QRCodeGenerator() {
                                             <Flex align="center">
                                                 <Text style={{marginRight: 4, minWidth: '45px'}}>Logo: </Text>
                                                 <Upload
-                                                    progress={{ strokeWidth: 2, showInfo: false }}
+                                                    progress={{strokeWidth: 2, showInfo: false}}
                                                     beforeUpload={beforeUpload}
                                                     accept="image/*"
                                                     showUploadList={false}
                                                     onChange={handleLogoChange}
                                                 >
-                                                    <Button>{loading ? <LoadingOutlined/> : <UploadOutlined/>}Image</Button>
+                                                    <Button>{loading ? <LoadingOutlined/> :
+                                                        <UploadOutlined/>}Image</Button>
                                                 </Upload>
                                             </Flex>
                                         </Col>
