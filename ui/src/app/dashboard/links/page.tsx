@@ -12,6 +12,7 @@ import {
   Space,
   Spin,
   Table,
+  TableProps,
   Tag,
   Tooltip,
 } from "antd";
@@ -22,24 +23,41 @@ import Image from "next/image";
 import { useAuthContext } from "@/hooks/Auth";
 import { useNotification } from "@/utils/notifications";
 import { useUtm } from "@/hooks/Utm";
+import { CiEdit } from "react-icons/ci";
 import dayjs from "dayjs";
 
 const { Search } = Input;
 const { Option } = Select;
 
 export default function LinksPage() {
-  const { loading, linkData, fetchLinks, createLink } = useLinks();
+  const { loading, linkData, fetchLinks, createLink, updateLink } = useLinks();
   const { utmList, fetchUtmList } = useUtm();
   const [selectedUtm, setSelectedUtm] = useState<number | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
+  const { checkAuth, isAuthenticated } = useAuthContext();
+  const [isModelVisible, setIsModalVisible] = useState(false);
+  const { openNotification } = useNotification();
+  const [editingLink, setEditingLink] = useState<LinkParams | null>(null);
 
+  useEffect(() => {
+    const _fetchData = async () => {
+      checkAuth();
+      if (isAuthenticated) {
+        await fetchLinks();
+        await fetchUtmList();
+      }
+    };
+    _fetchData().catch((error) => {
+      openNotification("error", error);
+    });
+  }, [isAuthenticated]);
   const filteredLinkData = linkData?.map((link) => ({
     ...link,
     campaign: link.utm?.campaign,
   }));
-  const columns = [
+  const columns: TableProps<LinkParams>["columns"] = [
     {
       title: "Original URL",
       dataIndex: "original_url",
@@ -109,28 +127,47 @@ export default function LinksPage() {
     {
       title: "Action",
       key: "action",
-      render: () => (
+      render: (_, record: LinkParams) => (
         <Space size="middle">
           <Button type="link" icon={<SiSimpleanalytics color={"#7C3AED"} />}>
             Analytics
+          </Button>
+          <Button
+            type="text"
+            form={"form"}
+            style={{ color: "#7C3AED" }}
+            icon={<CiEdit color={"#7C3AED"} />}
+            onClick={() => showModal(record)}
+          >
+            Edit
           </Button>
         </Space>
       ),
     },
   ];
-  const { checkAuth, isAuthenticated } = useAuthContext();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { openNotification } = useNotification();
 
-  const showModal = () => {
-    setIsModalOpen(true);
+  const showModal = (link?: LinkParams) => {
+    if (link) {
+      setEditingLink(link);
+      form.setFieldsValue(link);
+      setExpiresAt(link.expires_at);
+      setSelectedUtm(link.utm?.id || null);
+    } else {
+      setEditingLink(null);
+      form.resetFields();
+    }
+    setIsModalVisible(true);
   };
 
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      await createLink(values.url, selectedUtm, expiresAt);
-      form.resetFields();
+      if (editingLink) {
+        await updateLink(editingLink.id, selectedUtm, expiresAt);
+      } else {
+        await createLink(values.original_url, selectedUtm, expiresAt);
+        form.resetFields();
+      }
     } catch (error) {
       if (error instanceof Error) {
         openNotification("error", error?.message);
@@ -139,24 +176,14 @@ export default function LinksPage() {
         console.error(error);
       }
     }
-    setIsModalOpen(false);
+    setIsModalVisible(false);
   };
   const handleCancel = () => {
-    setIsModalOpen(false);
+    setIsModalVisible(false);
     form.resetFields();
+    setSelectedUtm(null);
+    setExpiresAt(null);
   };
-  useEffect(() => {
-    const _fetchData = async () => {
-      checkAuth();
-      if (isAuthenticated) {
-        await fetchLinks();
-        await fetchUtmList();
-      }
-    };
-    _fetchData().catch((error) => {
-      openNotification("error", error);
-    });
-  }, [isAuthenticated]);
   return (
     <>
       {!isAuthenticated ? (
@@ -170,7 +197,11 @@ export default function LinksPage() {
               onChange={(e) => setSearchText(e.target.value)}
               style={{ width: "40%" }}
             />
-            <Button type="primary" icon={<PlusOutlined />} onClick={showModal}>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => showModal}
+            >
               Link
             </Button>
           </Flex>
@@ -196,15 +227,15 @@ export default function LinksPage() {
           />
 
           <Modal
-            title="Create New Link"
-            open={isModalOpen}
+            title="Create/Edit New Link"
+            open={isModelVisible}
             onOk={handleOk}
             onCancel={handleCancel}
           >
             <Form form={form} layout="vertical" name="create_link_form">
               <Form.Item
-                name="url"
-                label="URL to shorten"
+                style={{ marginTop: 16 }}
+                name="original_url"
                 rules={[
                   {
                     required: true,
@@ -213,13 +244,14 @@ export default function LinksPage() {
                   { type: "url", message: "Please enter a valid URL!" },
                 ]}
               >
-                <Input />
+                <Input placeholder="Enter URL" />
               </Form.Item>
               <Form.Item>
                 <Select
                   style={{ margin: "auto" }}
                   allowClear={true}
-                  defaultValue={null}
+                  placeholder="Select Campaign"
+                  value={selectedUtm || null}
                   onChange={(value) => setSelectedUtm(value)}
                 >
                   {utmList?.map((utm) => (
@@ -234,11 +266,13 @@ export default function LinksPage() {
                   style={{ width: "100%" }}
                   format="YYYY-MM-DDTHH:mm:ss"
                   showTime
+                  placeholder="Select Expiry Date"
+                  value={expiresAt ? dayjs(new Date(expiresAt)) : null}
+                  needConfirm
                   minDate={dayjs(Date(), "YYYY-MM-DDTHH:mm:ss")}
                   onChange={(date, dateString) =>
                     setExpiresAt(dateString as string)
                   }
-                  needConfirm
                 />
               </Form.Item>
             </Form>

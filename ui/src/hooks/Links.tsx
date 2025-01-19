@@ -13,6 +13,7 @@ export interface LinkParams {
   favicon_url: string;
   status: string;
   utm: UtmParams | null;
+  expires_at: string | null;
 }
 
 export const useLinks = () => {
@@ -103,5 +104,50 @@ export const useLinks = () => {
       setLoading(false);
     }
   };
-  return { loading, linkData, fetchLinks, createLink, openNotification };
+
+  const updateLink = async (
+    id: number,
+    utm_id: number | null,
+    expires_at: string | null,
+  ) => {
+    try {
+      setLoading(true);
+      const token = getToken();
+      const response = await fetch(apiUrl + `/api/links/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          utm_id: utm_id,
+          expires_at: expires_at,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      const updatedLink: LinkParams = await response.json();
+      setLinkData(
+        (linkData ?? []).map((link) => (link.id === id ? updatedLink : link)),
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        openNotification("error", error.message);
+      } else {
+        openNotification("error", "Unknown error occurred");
+        console.log(error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+  return {
+    loading,
+    linkData,
+    fetchLinks,
+    createLink,
+    updateLink,
+    openNotification,
+  };
 };
