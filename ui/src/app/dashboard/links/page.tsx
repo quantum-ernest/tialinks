@@ -18,13 +18,14 @@ import {
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { SiSimpleanalytics } from "react-icons/si";
-import { LinkParams, useLinks } from "@/hooks/Links";
+import { useLinks } from "@/hooks/Links";
 import Image from "next/image";
 import { useAuthContext } from "@/hooks/Auth";
 import { useNotification } from "@/utils/notifications";
 import { useUtm } from "@/hooks/Utm";
 import { CiEdit } from "react-icons/ci";
 import dayjs from "dayjs";
+import { LinkType } from "@/schemas/Link";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -39,7 +40,7 @@ export default function LinksPage() {
   const { checkAuth, isAuthenticated } = useAuthContext();
   const [isModelVisible, setIsModalVisible] = useState(false);
   const { openNotification } = useNotification();
-  const [editingLink, setEditingLink] = useState<LinkParams | null>(null);
+  const [editingLink, setEditingLink] = useState<LinkType | null>(null);
 
   useEffect(() => {
     const _fetchData = async () => {
@@ -57,7 +58,7 @@ export default function LinksPage() {
     ...link,
     campaign: link.utm?.campaign,
   }));
-  const columns: TableProps<LinkParams>["columns"] = [
+  const columns: TableProps<LinkType>["columns"] = [
     {
       title: "Original URL",
       dataIndex: "original_url",
@@ -66,7 +67,7 @@ export default function LinksPage() {
       ellipsis: {
         showTitle: false,
       },
-      render: (original_url: string, record: LinkParams) => (
+      render: (original_url: string, record: LinkType) => (
         <>
           <Flex align="center">
             <Image
@@ -109,7 +110,7 @@ export default function LinksPage() {
       title: "Clicks",
       dataIndex: "count",
       key: "count",
-      sorter: (a: LinkParams, b: LinkParams) => a.count - b.count,
+      sorter: (a: LinkType, b: LinkType) => a.count - b.count,
     },
     {
       title: "Created",
@@ -127,7 +128,7 @@ export default function LinksPage() {
     {
       title: "Action",
       key: "action",
-      render: (_, record: LinkParams) => (
+      render: (_, record: LinkType) => (
         <Space size="middle">
           <Button type="link" icon={<SiSimpleanalytics color={"#7C3AED"} />}>
             Analytics
@@ -146,7 +147,7 @@ export default function LinksPage() {
     },
   ];
 
-  const showModal = (link?: LinkParams) => {
+  const showModal = (link?: LinkType) => {
     if (link) {
       setEditingLink(link);
       form.setFieldsValue(link);
@@ -208,7 +209,7 @@ export default function LinksPage() {
           <Table
             columns={columns}
             dataSource={filteredLinkData?.filter(
-              (link: LinkParams) =>
+              (link: LinkType) =>
                 link.original_url
                   .toLowerCase()
                   .includes(searchText.toLowerCase()) ||

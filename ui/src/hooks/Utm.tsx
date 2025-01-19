@@ -1,19 +1,12 @@
 import { useState } from "react";
 import { useNotification } from "../utils/notifications";
 import { getToken } from "@/utils/auth";
-
-export interface UtmParams {
-  id: number;
-  campaign: string;
-  source: string;
-  medium: string;
-  link_count: number;
-}
+import { UtmArraySchema, UtmSchema, UtmType } from "@/schemas/Utm";
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 export const useUtm = () => {
   const { openNotification } = useNotification();
-  const [utmList, setUtmList] = useState<UtmParams[] | null>(null);
+  const [utmList, setUtmList] = useState<UtmType[] | null>(null);
   const [loading, setLoading] = useState(true);
   const fetchUtmList = async () => {
     try {
@@ -28,8 +21,14 @@ export const useUtm = () => {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      const data: UtmParams[] = await response.json();
+      const data: UtmType[] = await response.json();
+      const validation = UtmArraySchema.safeParse(data);
+      if (!validation.success) {
+        console.error(validation.error.errors);
+        throw new Error("API response validation failed");
+      }
       setUtmList(data);
+      setLoading(false);
     } catch (error) {
       if (error instanceof Error) {
         openNotification("error", error.message);
@@ -42,7 +41,7 @@ export const useUtm = () => {
     }
   };
 
-  const createUtm = async (utmParams: Omit<UtmParams, "id">) => {
+  const createUtm = async (utmParams: Omit<UtmType, "id">) => {
     try {
       const token = getToken();
       const response = await fetch(apiUrl + "/api/utms", {
@@ -56,7 +55,12 @@ export const useUtm = () => {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      const newUtm = await response.json();
+      const newUtm: UtmType = await response.json();
+      const validation = UtmSchema.safeParse(newUtm);
+      if (!validation.success) {
+        console.error(validation.error.errors);
+        throw new Error("API response validation failed");
+      }
       setUtmList([newUtm, ...(utmList ?? [])]);
       openNotification("success", "UTM created successfully");
     } catch (error) {
@@ -69,7 +73,7 @@ export const useUtm = () => {
     }
   };
 
-  const updateUtm = async (id: number, utmParams: Omit<UtmParams, "id">) => {
+  const updateUtm = async (id: number, utmParams: Omit<UtmType, "id">) => {
     try {
       const token = getToken();
       const response = await fetch(apiUrl + `/api/utms/${id}`, {
@@ -83,7 +87,12 @@ export const useUtm = () => {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      const updatedUtm = await response.json();
+      const updatedUtm: UtmType = await response.json();
+      const validation = UtmSchema.safeParse(updatedUtm);
+      if (!validation.success) {
+        console.error(validation.error.errors);
+        throw new Error("API response validation failed");
+      }
       setUtmList(
         (utmList ?? []).map((utm) => (utm.id === id ? updatedUtm : utm)),
       );

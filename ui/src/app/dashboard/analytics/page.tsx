@@ -34,7 +34,7 @@ import { useAnalytics } from "@/hooks/Analytics";
 import { useLinks } from "@/hooks/Links";
 import dayjs from "dayjs";
 import GeographicalMap from "@/components/GeograhicalMap";
-import { TopPerformingLinksType } from "@/schemas/analytics";
+import { TopPerformingLinksType } from "@/schemas/Analytics";
 import { useAuthContext } from "@/hooks/Auth";
 import { useNotification } from "@/utils/notifications";
 

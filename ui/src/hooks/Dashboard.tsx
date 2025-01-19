@@ -1,44 +1,14 @@
 import { useState } from "react";
 import { useNotification } from "@/utils/notifications";
 import { getToken } from "@/utils/auth";
-
-export interface DashboardPrams {
-  total_links: number;
-  total_clicks: number;
-  average_clicks_per_link: number;
-  top_performing_links: {
-    link_id: number;
-    shortcode: string;
-    click_count: number;
-  }[];
-  top_referring_campaign: {
-    campaign: string;
-    click_count: number;
-  }[];
-  top_referring_site: {
-    domain: string;
-    click_count: number;
-  }[];
-  top_device: {
-    device: string;
-    click_count: number;
-  }[];
-  top_country: {
-    country: string;
-    click_count: number;
-  }[];
-  monthly_click_trend: {
-    month: string;
-    click_count: number;
-  }[];
-}
+import { DashboardSchema, DashboardType } from "@/schemas/Dashboard";
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
 export const useDashboard = () => {
   const { openNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const [dashboardData, setDashboardData] = useState<DashboardPrams | null>(
+  const [dashboardData, setDashboardData] = useState<DashboardType | null>(
     null,
   );
   const fetchDashboardData = async () => {
@@ -52,7 +22,12 @@ export const useDashboard = () => {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      const data: DashboardPrams = await response.json();
+      const data: DashboardType = await response.json();
+      const validation = DashboardSchema.safeParse(data);
+      if (!validation.success) {
+        console.error(validation.error.errors);
+        throw new Error("API response validation failed");
+      }
       setDashboardData(data);
       setLoading(false);
     } catch (error) {

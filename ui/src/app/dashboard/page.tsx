@@ -2,34 +2,31 @@
 
 import React, { useEffect, useRef } from "react";
 import {
+  Card,
+  Col,
   Layout,
   Row,
-  Col,
-  Card,
+  Spin,
+  Statistic,
   Table,
   Typography,
-  Statistic,
-  Spin,
 } from "antd";
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Legend,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell,
 } from "recharts";
 import { useDashboard } from "@/hooks/Dashboard";
-
-const { Content } = Layout;
-const { Title } = Typography;
 import animatedClickIcon from "../../assets/icons/click-Animation.json";
 import animatedLinkIcon from "../../assets/icons/link-Animation.json";
 import animatedGraphIcon from "../../assets/icons/graph-Animation.json";
@@ -37,6 +34,9 @@ import Lottie from "lottie-react";
 import { useAuthContext } from "@/hooks/Auth";
 
 import { useNotification } from "@/utils/notifications";
+
+const { Content } = Layout;
+const { Title } = Typography;
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
@@ -125,7 +125,7 @@ export default function Dashboard() {
                     >
                       <Statistic
                         title="Average Clicks per Link"
-                        value={dashboardData?.average_clicks_per_link}
+                        value={dashboardData?.average_clicks}
                         precision={2}
                         prefix={
                           <Lottie

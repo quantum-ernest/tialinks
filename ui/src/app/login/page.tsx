@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Card, Input, Button, Typography, Form, Flex } from "antd";
+import { Button, Card, Flex, Form, Input, Typography } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { InputOTP } from "antd-input-otp";
 import "../styles/login.css";
 import { useAuth } from "@/hooks/Auth";
 import { useNotification } from "@/utils/notifications";
+import { OTP } from "@/schemas/misc";
 
 const { Title } = Typography;
-type OTP = string[] | null;
 
 export default function LoginPage() {
   const [form] = Form.useForm();

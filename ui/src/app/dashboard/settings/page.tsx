@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { Card, Form, Input, Button, Row, Col, Spin } from "antd";
+import { Button, Card, Col, Form, Input, Row, Spin } from "antd";
 import { getUserObject } from "@/utils/auth";
 import { useUser } from "@/hooks/User";
 import { useAuthContext } from "@/hooks/Auth";
+import { UserType } from "@/schemas/User";
 
 export default function SettingsPage() {
   const { checkAuth, isAuthenticated } = useAuthContext();
@@ -12,12 +13,14 @@ export default function SettingsPage() {
   const { updateUser, loading } = useUser();
   const user = getUserObject();
   const userData = user ? JSON.parse(user) : null;
-  const onFinish = async ({ name }: { name: string }) => {
-    await updateUser(name);
-  };
+
   useEffect(() => {
     checkAuth();
   }, [isAuthenticated]);
+
+  const onFinish = async ({ name }: { name: Omit<UserType, "email"> }) => {
+    await updateUser(name);
+  };
   return (
     <>
       {!isAuthenticated ? (

@@ -1,23 +1,23 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { Layout, Menu, Button, Avatar, Typography, Spin } from "antd";
+import React, { useEffect, useState } from "react";
+import { Avatar, Button, Layout, Menu, Spin, Typography } from "antd";
 import {
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
+  BarChartOutlined,
   DashboardOutlined,
   LinkOutlined,
-  BarChartOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { MdOutlineCampaign } from "react-icons/md";
 import { ImQrcode } from "react-icons/im";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getUserObject } from "@/utils/auth";
 import { CiLogout } from "react-icons/ci";
-import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/hooks/Auth";
+
 const { Header, Sider, Content } = Layout;
 const { Text } = Typography;
 

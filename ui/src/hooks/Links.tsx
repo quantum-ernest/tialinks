@@ -1,25 +1,12 @@
 import { useState } from "react";
 import { useNotification } from "@/utils/notifications";
 import { getToken } from "@/utils/auth";
-import { UtmParams } from "@/hooks/Utm";
-
-export interface LinkParams {
-  id: number;
-  original_url: string;
-  generated_url: string;
-  shortcode: string;
-  count: number;
-  created_at: string;
-  favicon_url: string;
-  status: string;
-  utm: UtmParams | null;
-  expires_at: string | null;
-}
+import { LinkArraySchema, LinkSchema, LinkType } from "@/schemas/Link";
 
 export const useLinks = () => {
   const { openNotification } = useNotification();
   const [loading, setLoading] = useState(false);
-  const [linkData, setLinkData] = useState<LinkParams[] | null>(null);
+  const [linkData, setLinkData] = useState<LinkType[] | null>(null);
   const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
   const fetchLinks = async () => {
@@ -36,8 +23,13 @@ export const useLinks = () => {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      const data: LinkParams[] = await response.json();
-      const formattedData: LinkParams[] = data.map((link: LinkParams) => ({
+      const data: LinkType[] = await response.json();
+      const validation = LinkArraySchema.safeParse(data);
+      if (!validation.success) {
+        console.error(validation.error.errors);
+        throw new Error("API response validation failed");
+      }
+      const formattedData: LinkType[] = data.map((link: LinkType) => ({
         ...link,
         created_at: new Date(link.created_at.split(".")[0]).toLocaleString(
           "en-US",
@@ -67,8 +59,8 @@ export const useLinks = () => {
 
   const createLink = async (
     originalUrl: string,
-    utm_id: number | null,
-    expires_at: string | null,
+    utm_id: number | null = null,
+    expires_at: string | null = null,
   ) => {
     try {
       setLoading(true);
@@ -88,7 +80,12 @@ export const useLinks = () => {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      const newLink: LinkParams = await response.json();
+      const newLink: LinkType = await response.json();
+      const validation = LinkSchema.safeParse(newLink);
+      if (!validation.success) {
+        console.error(validation.error.errors);
+        throw new Error("API response validation failed");
+      }
       setLinkData((prevData) =>
         prevData ? [newLink, ...prevData] : [newLink],
       );
@@ -127,7 +124,12 @@ export const useLinks = () => {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      const updatedLink: LinkParams = await response.json();
+      const updatedLink: LinkType = await response.json();
+      const validation = LinkSchema.safeParse(updatedLink);
+      if (!validation.success) {
+        console.error(validation.error.errors);
+        throw new Error("API response validation failed");
+      }
       setLinkData(
         (linkData ?? []).map((link) => (link.id === id ? updatedLink : link)),
       );

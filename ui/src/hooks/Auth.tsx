@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useState, createContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { useNotification } from "@/utils/notifications";
 import {
   isTokenValid,
@@ -11,6 +11,7 @@ import {
 import { useRouter } from "next/navigation";
 import { getPendingUrl } from "@/utils/pendingUrl";
 import { useLinks } from "@/hooks/Links";
+import { AuthSchema } from "@/schemas/Auth";
 
 const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
@@ -61,6 +62,11 @@ export const useAuth = () => {
         throw new Error(response.statusText);
       }
       const data = await response.json();
+      const validation = AuthSchema.safeParse(data);
+      if (!validation.success) {
+        console.error(validation.error.errors);
+        throw new Error("API response validation failed");
+      }
       setToken(data.token);
       setUserObject(JSON.stringify(data.user));
       setIsAuthenticated(true);

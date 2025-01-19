@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import type { GetProp, UploadProps } from "antd";
+import type { UploadProps } from "antd";
 import {
   Button,
   Col,
@@ -24,21 +24,17 @@ import {
   PlusOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { LinkParams, useLinks } from "@/hooks/Links";
+import { useLinks } from "@/hooks/Links";
 import { useNotification } from "@/utils/notifications";
 import { useAuthContext } from "@/hooks/Auth";
+import { LinkType } from "@/schemas/Link";
+import { FileType } from "@/schemas/misc";
+import { getBase64 } from "@/utils/misc";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
-type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 const MIN_SIZE = 48;
 const MAX_SIZE = 300;
-
-const getBase64 = (img: FileType, callback: (url: string) => void) => {
-  const reader = new FileReader();
-  reader.addEventListener("load", () => callback(reader.result as string));
-  reader.readAsDataURL(img);
-};
 
 export default function QRCodeGenerator() {
   const { checkAuth, isAuthenticated } = useAuthContext();
@@ -53,8 +49,19 @@ export default function QRCodeGenerator() {
   const { openNotification } = useNotification();
   const { linkData, fetchLinks } = useLinks();
   const [loading, setLoading] = useState(false);
+  const [selectedLink, setSelectedLink] = useState<LinkType | null>(null);
 
-  const [selectedLink, setSelectedLink] = useState<LinkParams | null>(null);
+  useEffect(() => {
+    const _fetchData = async () => {
+      checkAuth();
+      if (isAuthenticated) {
+        await fetchLinks();
+      }
+    };
+    _fetchData().catch((error) => {
+      openNotification("error", error);
+    });
+  }, [isAuthenticated]);
 
   const increase = () => {
     setSize((prevSize) => {
@@ -173,18 +180,6 @@ export default function QRCodeGenerator() {
       doDownload(url, "QRCode.svg");
     }
   };
-
-  useEffect(() => {
-    const _fetchData = async () => {
-      checkAuth();
-      if (isAuthenticated) {
-        await fetchLinks();
-      }
-    };
-    _fetchData().catch((error) => {
-      openNotification("error", error);
-    });
-  }, [isAuthenticated]);
   return (
     <>
       {!isAuthenticated ? (

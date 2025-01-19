@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const AnalyticsSchema = z.object({
+export const AnalyticsSchema = z.object({
   total_clicks: z.number(),
   total_links: z.number(),
   top_performing_links: z.array(
@@ -92,5 +92,3 @@ export type TopPerformingLinksType =
   AnalyticsType["top_performing_links"][number];
 
 export type GeographicalDataType = AnalyticsType["geographical_data"] | null;
-
-export { AnalyticsSchema };

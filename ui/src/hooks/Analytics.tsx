@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNotification } from "@/utils/notifications";
-import { AnalyticsSchema, AnalyticsType } from "@/schemas/analytics";
+import { AnalyticsSchema, AnalyticsType } from "@/schemas/Analytics";
 import { getToken } from "@/utils/auth";
 import dayjs from "dayjs";
 

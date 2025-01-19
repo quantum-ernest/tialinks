@@ -2,35 +2,46 @@
 import { useEffect, useState } from "react";
 import {
   Button,
+  Flex,
+  Form,
   Input,
   Modal,
-  Form,
-  Flex,
-  Table,
   Space,
-  Tag,
-  TableProps,
   Spin,
+  Table,
+  TableProps,
+  Tag,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useUtm } from "@/hooks/Utm";
 import { CiEdit } from "react-icons/ci";
-import { UtmParams } from "@/hooks/Utm";
 import Search from "antd/es/input/Search";
 import { useAuthContext } from "@/hooks/Auth";
 import { useNotification } from "@/utils/notifications";
+import { UtmType } from "@/schemas/Utm";
 
 export default function UtmPage() {
   const { utmList, fetchUtmList, loading, createUtm, updateUtm } = useUtm();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingUtm, setEditingUtm] = useState<UtmParams | null>(null);
+  const [editingUtm, setEditingUtm] = useState<UtmType | null>(null);
   const { checkAuth, isAuthenticated } = useAuthContext();
   const { openNotification } = useNotification();
-
   const [searchText, setSearchText] = useState("");
   const [form] = Form.useForm();
 
-  const showModal = (utm?: UtmParams) => {
+  useEffect(() => {
+    const _fetchData = async () => {
+      checkAuth();
+      if (isAuthenticated) {
+        await fetchUtmList();
+      }
+    };
+    _fetchData().catch((error) => {
+      openNotification("error", error);
+    });
+  }, [isAuthenticated]);
+
+  const showModal = (utm?: UtmType) => {
     if (utm) {
       setEditingUtm(utm);
       form.setFieldsValue(utm);
@@ -61,7 +72,7 @@ export default function UtmPage() {
     form.resetFields();
   };
 
-  const columns: TableProps<UtmParams>["columns"] = [
+  const columns: TableProps<UtmType>["columns"] = [
     {
       title: "Campaign",
       dataIndex: "campaign",
@@ -82,7 +93,7 @@ export default function UtmPage() {
       title: "Link Count",
       dataIndex: "link_count",
       key: "link_count",
-      render: (_, { link_count }) => (
+      render: (link_count) => (
         <Tag color={link_count > 1 ? "green" : "volcano"} key={link_count}>
           {link_count}
         </Tag>
@@ -91,7 +102,7 @@ export default function UtmPage() {
     {
       title: "Action",
       key: "action",
-      render: (_, record: UtmParams) => (
+      render: (_, record: UtmType) => (
         <Space size="middle">
           <Button
             type="text"
@@ -106,17 +117,6 @@ export default function UtmPage() {
       ),
     },
   ];
-  useEffect(() => {
-    const _fetchData = async () => {
-      checkAuth();
-      if (isAuthenticated) {
-        await fetchUtmList();
-      }
-    };
-    _fetchData().catch((error) => {
-      openNotification("error", error);
-    });
-  }, [isAuthenticated]);
   return (
     <>
       {!isAuthenticated ? (
@@ -143,7 +143,7 @@ export default function UtmPage() {
           <Table
             columns={columns}
             dataSource={utmList?.filter(
-              (utm: UtmParams) =>
+              (utm: UtmType) =>
                 utm.campaign.toLowerCase().includes(searchText.toLowerCase()) ||
                 utm.source.toLowerCase().includes(searchText.toLowerCase()) ||
                 utm.medium.toLowerCase().includes(searchText.toLowerCase()),

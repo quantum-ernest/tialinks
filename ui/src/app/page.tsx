@@ -37,9 +37,10 @@ import { GrSecure } from "react-icons/gr";
 import { TbBrandOpenSource } from "react-icons/tb";
 import { useRouter } from "next/navigation";
 import { setPendingUrl } from "@/utils/pendingUrl";
-import { LinkParams, useLinks } from "@/hooks/Links";
+import { useLinks } from "@/hooks/Links";
 import { useNotification } from "@/utils/notifications";
 import { useAuthContext } from "@/hooks/Auth";
+import { LinkType } from "@/schemas/Link";
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph, Text, Link } = Typography;
@@ -56,6 +57,11 @@ export default function Home() {
   const toggleMobileMenu = () => {
     setMobileMenuVisible(!mobileMenuVisible);
   };
+
+  useEffect(() => {
+    checkAuth();
+  }, [isAuthenticated]);
+
   const handleCopy = () => {
     if (shortUrl) {
       navigator.clipboard.writeText(shortUrl);
@@ -63,14 +69,11 @@ export default function Home() {
       setTimeout(() => setCopied(false), 5000);
     }
   };
-  useEffect(() => {
-    checkAuth();
-  }, [isAuthenticated]);
 
   const handleShorten = async () => {
     if (isAuthenticated && url) {
       try {
-        const newLink: LinkParams | undefined = await createLink(url);
+        const newLink: LinkType | undefined = await createLink(url);
         if (newLink) {
           setShortUrl(newLink.generated_url);
         }

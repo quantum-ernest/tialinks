@@ -1,17 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
+import React, { useEffect, useState } from "react";
+import { CircleMarker, MapContainer, Popup, TileLayer } from "react-leaflet";
 import { Card, Select, Spin } from "antd";
 import "leaflet/dist/leaflet.css";
-import { GeographicalDataType } from "@/schemas/analytics";
-
-type Coordinate = [number, number];
-interface Location {
-  name: string;
-  click_count: number;
-  coordinates: Coordinate;
-}
+import { GeographicalDataType } from "@/schemas/Analytics";
+import { Coordinate, Location } from "@/schemas/misc";
 
 async function geocode(locationName: string): Promise<Coordinate> {
   try {
