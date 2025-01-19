@@ -1,0 +1,6 @@
+# Ignore artifacts:
+coverage
+.idea
+.next
+node_modules
+

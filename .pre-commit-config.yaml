@@ -3,17 +3,17 @@ default_language_version:
   node: "22.11.0"
 
 repos:
-  # ESLint for JavaScript/TypeScript in the `ui` directory
-  - repo: https://github.com/pre-commit/mirrors-eslint
-    rev: v8.24.0
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v2.1.0
     hooks:
-      - id: eslint
-        name: eslint (ui)
-        verbose: true
+      - id: prettier
+        types_or: [css, javascript]
+        additional_dependencies:
+        -   prettier@2.1.2
+        -   '@prettier/plugin-xml@0.12.0'
         args:
-          - --color
-          - --fix
-        # Only run eslint in the `ui` folder
+          - "--write"
+          - "--ignore-path=ui/.prettierignore"
         files: ^ui/
 
   # General hooks for code hygiene

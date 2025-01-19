@@ -6,8 +6,7 @@
   top: 0;
   z-index: 1;
   width: 100%;
-    background: #fff;
-
+  background: #fff;
 }
 
 .desktop-menu {
@@ -66,8 +65,8 @@
 
 @media (max-width: 576px) {
   .tialinks-footer {
-      background-color: #f3f4f6;
-  padding: 48px 0;
+    background-color: #f3f4f6;
+    padding: 48px 0;
     text-align: center;
   }
 
@@ -79,7 +78,6 @@
     margin-bottom: 24px;
   }
 }
-
 
 .ant-input-search .ant-input {
   height: 50px;
@@ -108,13 +106,13 @@
 
 .join-community-section {
   padding: 48px 16px;
-  background-color: #F3F4F6;
+  background-color: #f3f4f6;
 }
 
 .join-community-title {
   font-size: clamp(2rem, 5vw, 3rem);
   margin-bottom: 24px;
-  color: #1F2937;
+  color: #1f2937;
   text-align: center;
 }
 
@@ -126,7 +124,7 @@
 
 .join-community-content .ant-typography {
   font-size: clamp(1rem, 2vw, 1.125rem);
-  color: #4B5563;
+  color: #4b5563;
   margin-bottom: 16px;
 }
 
@@ -139,4 +137,3 @@
     text-align: center;
   }
 }
-
