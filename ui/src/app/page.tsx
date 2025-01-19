@@ -10,6 +10,7 @@ import {
   Input,
   Layout,
   Menu,
+  Modal,
   Row,
   Space,
   Tooltip,
@@ -41,6 +42,8 @@ import { useLinks } from "@/hooks/Links";
 import { useNotification } from "@/utils/notifications";
 import { useAuthContext } from "@/hooks/Auth";
 import { LinkType } from "@/schemas/Link";
+import PrivacyPolicy from "@/components/PrivacyPolicy";
+import TermsOfService from "@/components/TermsOfService";
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph, Text, Link } = Typography;
@@ -147,7 +150,14 @@ export default function Home() {
           ],
     },
   ];
-
+  const [selectedModelView, setSelectedModelView] = useState<string | null>(
+    null,
+  );
+  const [isModelVisible, setIsModalVisible] = useState(false);
+  const handleShowModal = (page: string) => {
+    setSelectedModelView(page);
+    setIsModalVisible(true);
+  };
   return (
     <>
       <Layout>
@@ -645,12 +655,14 @@ export default function Home() {
                 <Space direction="vertical" size="middle">
                   <Button
                     type="link"
+                    onClick={() => handleShowModal("terms_of_service")}
                     style={{ color: "#4B5563", padding: "0" }}
                   >
                     Terms of Service
                   </Button>
                   <Button
                     type="link"
+                    onClick={() => handleShowModal("privacy_policy")}
                     style={{ color: "#4B5563", padding: "0" }}
                   >
                     Privacy Policy
@@ -702,6 +714,18 @@ export default function Home() {
             </Row>
           </div>
         </Footer>
+        <Modal
+          centered
+          open={isModelVisible}
+          onCancel={() => setIsModalVisible(false)}
+          okButtonProps={{ style: { display: "none" } }}
+        >
+          {selectedModelView === "privacy_policy" ? (
+            <PrivacyPolicy />
+          ) : (
+            <TermsOfService />
+          )}
+        </Modal>
       </Layout>
     </>
   );
