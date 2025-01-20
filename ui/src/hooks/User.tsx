@@ -12,7 +12,7 @@ export const useUser = () => {
     try {
       setLoading(true);
       const token = getToken();
-      const response = await fetch(apiUrl + "/api/users", {
+      const response = await fetch(apiUrl + "/users", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

@@ -13,7 +13,7 @@ export const useLinks = () => {
     try {
       setLoading(true);
       const token = getToken();
-      const response = await fetch(apiUrl + "/api/links", {
+      const response = await fetch(apiUrl + "/links", {
         method: "GET",
         headers: {
           accept: "application/json",
@@ -65,7 +65,7 @@ export const useLinks = () => {
     try {
       setLoading(true);
       const token = getToken();
-      const response = await fetch(apiUrl + "/api/links", {
+      const response = await fetch(apiUrl + "/links", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -110,7 +110,7 @@ export const useLinks = () => {
     try {
       setLoading(true);
       const token = getToken();
-      const response = await fetch(apiUrl + `/api/links/${id}`, {
+      const response = await fetch(apiUrl + `/links/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

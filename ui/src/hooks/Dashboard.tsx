@@ -15,7 +15,7 @@ export const useDashboard = () => {
     try {
       setLoading(true);
       const token = getToken();
-      const response = await fetch(apiUrl + "/api/analytics/dashboard", {
+      const response = await fetch(apiUrl + "/analytics/dashboard", {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -28,7 +28,7 @@ export const useAnalytics = () => {
       const token = getToken();
       const response = await fetch(
         apiUrl +
-          `/api/analytics?start_date=${start_date}&end_date=${end_date}${link_id ? `&link_id=${link_id}` : ""}`,
+          `/analytics?start_date=${start_date}&end_date=${end_date}${link_id ? `&link_id=${link_id}` : ""}`,
         {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },

@@ -12,7 +12,7 @@ export const useUtm = () => {
     try {
       setLoading(true);
       const token = getToken();
-      const response = await fetch(apiUrl + "/api/utms", {
+      const response = await fetch(apiUrl + "/utms", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -44,7 +44,7 @@ export const useUtm = () => {
   const createUtm = async (utmParams: Omit<UtmType, "id">) => {
     try {
       const token = getToken();
-      const response = await fetch(apiUrl + "/api/utms", {
+      const response = await fetch(apiUrl + "/utms", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -76,7 +76,7 @@ export const useUtm = () => {
   const updateUtm = async (id: number, utmParams: Omit<UtmType, "id">) => {
     try {
       const token = getToken();
-      const response = await fetch(apiUrl + `/api/utms/${id}`, {
+      const response = await fetch(apiUrl + `/utms/${id}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

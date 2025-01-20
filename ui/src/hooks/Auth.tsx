@@ -25,7 +25,7 @@ export const useAuth = () => {
   const requestOTP = async (email: string) => {
     try {
       setLoading(true);
-      const response = await fetch(apiUrl + "/api/auth/otp/email/generate", {
+      const response = await fetch(apiUrl + "/auth/otp/email/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +53,7 @@ export const useAuth = () => {
     const pendingUrl = getPendingUrl();
     try {
       setLoading(true);
-      const response = await fetch(apiUrl + "/api/auth/otp/email/login", {
+      const response = await fetch(apiUrl + "/auth/otp/email/login", {
         method: "POST",
         headers: { "Content-type": "application/json" },
         body: JSON.stringify({ email: email, otp: otp }),
