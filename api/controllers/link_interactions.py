@@ -21,12 +21,18 @@ async def get_dashboard_summary(
     total_links = LinkMapper.get_total_links(
         session=session, user_id=auth_user["user_id"]
     )
+    distinct_total_links = LinkInteractionMapper.get_distinct_total_links(
+        session=session, user_id=auth_user["user_id"]
+    )
     result = {
         "total_links": total_links,
         "total_clicks": total_clicks,
-        "average_clicks_per_link": round(total_clicks / total_links, 2)
+        "average_clicks": round(total_clicks / total_links, 2)
         if total_links > 0
         else 0,
+        "percentage_of_links_with_clicks": round(
+            (distinct_total_links / total_clicks) * 100, 2
+        ),
         "top_performing_links": LinkInteractionMapper.get_top_performing_links(
             session=session, user_id=auth_user["user_id"]
         ),
@@ -63,23 +69,34 @@ async def get_analytics(
     total_clicks = LinkInteractionMapper.get_total_clicks(
         session=session,
         user_id=auth_user["user_id"],
+    )
+    total_links = LinkMapper.get_total_links(
+        session=session, user_id=auth_user["user_id"]
+    )
+    per_total_clicks = LinkInteractionMapper.get_total_clicks(
+        session=session,
+        user_id=auth_user["user_id"],
         start_date=start_date,
         end_date=end_date,
         link_id=link_id,
     )
-    total_links = (
-        1
-        if link_id
-        else LinkMapper.get_total_links(
-            session=session,
-            user_id=auth_user["user_id"],
-            start_date=start_date,
-            end_date=end_date,
-        )
+    per_distinct_total_links = LinkInteractionMapper.get_distinct_total_links(
+        session=session,
+        user_id=auth_user["user_id"],
+        start_date=start_date,
+        end_date=end_date,
+        link_id=link_id,
     )
+    average_click_per_active_link = (
+        per_total_clicks / per_distinct_total_links
+        if per_distinct_total_links > 0
+        else 0
+    )
+
     result = {
         "total_links": total_links,
         "total_clicks": total_clicks,
+        "average_clicks_per_active_link": round(average_click_per_active_link, 2),
         "top_performing_links": LinkInteractionMapper.get_top_performing_links(
             session=session,
             user_id=auth_user["user_id"],

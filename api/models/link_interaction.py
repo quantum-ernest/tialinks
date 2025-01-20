@@ -68,6 +68,19 @@ class LinkInteractionMapper(Base):
         return session.execute(query).scalar_one()
 
     @classmethod
+    def get_distinct_total_links(
+        cls,
+        session: Session,
+        user_id: int,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        link_id: int | None = None,
+    ):
+        query = select(func.count(cls.link_id.distinct().label("active_links")))
+        query = cls._build_where_clause(query, user_id, start_date, end_date, link_id)
+        return session.execute(query).scalar_one()
+
+    @classmethod
     def get_top_performing_links(
         cls,
         session: Session,
