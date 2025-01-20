@@ -164,7 +164,12 @@ export default function LinksPage() {
     try {
       const values = await form.validateFields();
       if (editingLink) {
-        await updateLink(editingLink.id, selectedUtm, expiresAt);
+        if (
+          editingLink.expires_at !== expiresAt ||
+          editingLink.utm_id !== selectedUtm
+        ) {
+          await updateLink(editingLink.id, selectedUtm, expiresAt);
+        }
       } else {
         await createLink(values.original_url, selectedUtm, expiresAt);
         form.resetFields();
@@ -201,7 +206,7 @@ export default function LinksPage() {
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() => showModal}
+              onClick={() => showModal()}
             >
               Link
             </Button>
