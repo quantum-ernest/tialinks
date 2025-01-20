@@ -7,7 +7,7 @@ from core import get_db_session
 from models import LinkInteractionMapper, LinkMapper
 from services import IsAuthenticated
 
-router = APIRouter(prefix="/api/analytics", tags=["ANALYSIS"])
+router = APIRouter(prefix="/api/v1/analytics", tags=["ANALYSIS"])
 
 
 @router.get("/dashboard")

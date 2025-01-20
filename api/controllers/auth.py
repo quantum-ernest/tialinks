@@ -10,7 +10,7 @@ from schemas import (
 from services.auth import AuthService
 from sqlalchemy.orm import Session
 
-router = APIRouter(prefix="/api/auth", tags=["AUTH"])
+router = APIRouter(prefix="/api/v1/auth", tags=["AUTH"])
 
 
 @router.post("/otp/email/login", response_model=LoginSchemaOut)

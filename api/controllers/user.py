@@ -5,7 +5,7 @@ from core import get_db_session
 from models import UserMapper
 from schemas import UserUpdateSchema, UserSchemaOut
 
-router = APIRouter(prefix="/api/users", tags=["USER"])
+router = APIRouter(prefix="/api/v1/users", tags=["USER"])
 
 
 @router.get("", response_model=UserSchemaOut)

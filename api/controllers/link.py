@@ -7,7 +7,7 @@ from schemas import LinkSchemaOut, LinkSchemaIn, LinkSchemaUpdate
 from services import IsAuthenticated
 from utils import generate_readable_short_code, build_favicon_url, update_link_status
 
-router = APIRouter(prefix="/api/links", tags=["LINK"])
+router = APIRouter(prefix="/api/v1/links", tags=["LINK"])
 
 
 @router.get("", response_model=List[LinkSchemaOut])
