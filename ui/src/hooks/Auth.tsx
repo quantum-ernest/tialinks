@@ -39,7 +39,7 @@ export const useAuth = () => {
     } catch (error) {
       if (error instanceof Error) {
         alert(error.message);
-        openNotification("error", error.message, "saaaaa");
+        openNotification("error", error.message);
       } else {
         openNotification("error", "Unknown error occurred");
         console.log(error);
