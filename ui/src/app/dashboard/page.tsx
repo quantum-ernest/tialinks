@@ -230,7 +230,7 @@ export default function Dashboard() {
                   <Title level={4}>Top Locations</Title>
                   <Table
                     dataSource={dashboardData?.top_country.slice(0, 5)}
-                    style={{ height: 325 }}
+                    style={{ height: 300 }}
                     loading={loading}
                     columns={[
                       {
