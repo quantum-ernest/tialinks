@@ -181,6 +181,7 @@ const EnhancedAnalytics: React.FC = () => {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="click_count"
+                    name="Clicks"
                     label
                   >
                     {analyticsData?.referring_sites.map((entry, index) => (
@@ -207,7 +208,8 @@ const EnhancedAnalytics: React.FC = () => {
                     cy="50%"
                     outerRadius={80}
                     fill="#8884d8"
-                    dataKey="value"
+                    dataKey="click_count"
+                    name="Clicks"
                     label
                   >
                     {analyticsData?.referring_campaigns.map((entry, index) => (
@@ -246,6 +248,7 @@ const EnhancedAnalytics: React.FC = () => {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="click_count"
+                    name="Clicks"
                     label
                   >
                     {analyticsData?.devices.map((entry, index) => (
@@ -276,6 +279,7 @@ const EnhancedAnalytics: React.FC = () => {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="click_count"
+                    name="Clicks"
                     label
                   >
                     {analyticsData?.browsers.map((entry, index) => (
@@ -306,12 +310,15 @@ const EnhancedAnalytics: React.FC = () => {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="click_count"
+                    name="Clicks"
                     label
                   >
-                    {/*{analyticsData?.operatingSystems.map((entry, index) => (*/}
-                    {/*    <Cell key={`cell-${index}`}*/}
-                    {/*          fill={COLORS[index % COLORS.length]}/>*/}
-                    {/*))}*/}
+                    {analyticsData?.operating_systems.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={COLORS[index % COLORS.length]}
+                      />
+                    ))}
                   </Pie>
                   <Tooltip />
                   <Legend />
