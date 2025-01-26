@@ -30,6 +30,7 @@ import { useDashboard } from "@/hooks/Dashboard";
 import animatedClickIcon from "../../assets/icons/click-Animation.json";
 import animatedLinkIcon from "../../assets/icons/link-Animation.json";
 import animatedGraphIcon from "../../assets/icons/graph-Animation.json";
+import animatedIncreaseIcon from "../../assets/icons/increase-Animation.json";
 import Lottie from "lottie-react";
 import { useAuthContext } from "@/hooks/Auth";
 
@@ -83,8 +84,8 @@ export default function Dashboard() {
                     <Col
                       xs={24}
                       sm={24}
-                      md={8}
-                      lg={8}
+                      md={6}
+                      lg={6}
                       style={{ display: "flex", justifyContent: "center" }}
                     >
                       <Statistic
@@ -101,8 +102,8 @@ export default function Dashboard() {
                     <Col
                       xs={24}
                       sm={24}
-                      md={8}
-                      lg={8}
+                      md={6}
+                      lg={6}
                       style={{ display: "flex", justifyContent: "center" }}
                     >
                       <Statistic
@@ -119,8 +120,8 @@ export default function Dashboard() {
                     <Col
                       xs={24}
                       sm={24}
-                      md={8}
-                      lg={8}
+                      md={6}
+                      lg={6}
                       style={{ display: "flex", justifyContent: "center" }}
                     >
                       <Statistic
@@ -133,6 +134,26 @@ export default function Dashboard() {
                             style={{ height: "1.5em", width: "2em" }}
                           />
                         }
+                      />
+                    </Col>
+                    <Col
+                      xs={24}
+                      sm={24}
+                      md={6}
+                      lg={6}
+                      style={{ display: "flex", justifyContent: "center" }}
+                    >
+                      <Statistic
+                        title="Link Click Percentage"
+                        value={dashboardData?.link_click_percentage}
+                        valueStyle={{ color: "#3f8600" }}
+                        prefix={
+                          <Lottie
+                            animationData={animatedIncreaseIcon}
+                            style={{ height: "1.5em", width: "2em" }}
+                          />
+                        }
+                        suffix="%"
                       />
                     </Col>
                   </Row>

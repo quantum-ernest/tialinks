@@ -4,6 +4,7 @@ export const DashboardSchema = z.object({
   total_links: z.number(),
   total_clicks: z.number(),
   average_clicks: z.number(),
+  link_click_percentage: z.number(),
   top_performing_links: z.array(
     z.object({
       link_id: z.number(),
