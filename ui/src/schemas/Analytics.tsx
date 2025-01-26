@@ -3,6 +3,7 @@ import { z } from "zod";
 export const AnalyticsSchema = z.object({
   total_clicks: z.number(),
   total_links: z.number(),
+  average_clicks_per_active_link: z.number(),
   top_performing_links: z.array(
     z.object({
       link_id: z.number(),

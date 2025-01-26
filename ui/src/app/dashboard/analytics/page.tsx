@@ -433,6 +433,7 @@ const EnhancedAnalytics: React.FC = () => {
                       <Select
                         style={{ width: "100%" }}
                         placeholder="Select a link"
+                        allowClear
                         onChange={(value) => setSelectedLink(value)}
                       >
                         {linkData?.map((link) => (
@@ -477,8 +478,8 @@ const EnhancedAnalytics: React.FC = () => {
               <Col xs={24} sm={24} md={6} lg={6}>
                 <Card style={{ display: "flex", justifyContent: "center" }}>
                   <Statistic
-                    title="Average Clicks per Link"
-                    value={analyticsData?.total_clicks} //Todo: change it to the actual value
+                    title="Avg Clicks/Active Link"
+                    value={analyticsData?.average_clicks_per_active_link}
                     precision={2}
                   />
                 </Card>
