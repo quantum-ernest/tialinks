@@ -102,7 +102,6 @@ async def get_analytics(
             user_id=auth_user["user_id"],
             start_date=start_date,
             end_date=end_date,
-            link_id=link_id,
         ),
         "total_clicks_per_day": LinkInteractionMapper.get_total_clicks_per_day(
             session=session,

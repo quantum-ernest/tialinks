@@ -37,6 +37,7 @@ import GeographicalMap from "@/components/GeograhicalMap";
 import { TopPerformingLinksType } from "@/schemas/Analytics";
 import { useAuthContext } from "@/hooks/Auth";
 import { useNotification } from "@/utils/notifications";
+import { useSearchParams } from "next/navigation";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -60,6 +61,10 @@ const EnhancedAnalytics: React.FC = () => {
   const { fetchAnalytics, loading, analyticsData } = useAnalytics();
   const { checkAuth, isAuthenticated } = useAuthContext();
   const { openNotification } = useNotification();
+  const searchParams = useSearchParams();
+  const [queryLinkID, setQueryLinkID] = useState<number | null>(
+    Number(searchParams.get("link_id")),
+  );
   useEffect(() => {
     const _fetchData = async () => {
       checkAuth();
@@ -72,6 +77,8 @@ const EnhancedAnalytics: React.FC = () => {
             );
         if (selectedLink) {
           await fetchAnalytics(start_date, end_date, selectedLink);
+        } else if (queryLinkID) {
+          await fetchAnalytics(start_date, end_date, queryLinkID);
         } else {
           await fetchAnalytics(start_date, end_date);
         }
@@ -81,8 +88,12 @@ const EnhancedAnalytics: React.FC = () => {
     _fetchData().catch((error) => {
       openNotification("error", error);
     });
-  }, [selectedLink, dateRange, isAuthenticated]);
+  }, [selectedLink, queryLinkID, dateRange, isAuthenticated]);
 
+  const handleLinkOnClear = () => {
+    setQueryLinkID(0);
+    setSelectedLink(null);
+  };
   const topPerformingColumns = [
     {
       title: "Short Url",
@@ -439,8 +450,10 @@ const EnhancedAnalytics: React.FC = () => {
                     <Col xs={24} sm={24} md={8} lg={8}>
                       <Select
                         style={{ width: "100%" }}
+                        defaultValue={queryLinkID ? queryLinkID : null}
                         placeholder="Select a link"
                         allowClear
+                        onClear={handleLinkOnClear}
                         onChange={(value) => setSelectedLink(value)}
                       >
                         {linkData?.map((link) => (

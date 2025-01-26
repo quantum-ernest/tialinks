@@ -26,6 +26,7 @@ import { useUtm } from "@/hooks/Utm";
 import { CiEdit } from "react-icons/ci";
 import dayjs from "dayjs";
 import { LinkType } from "@/schemas/Link";
+import { useRouter } from "next/navigation";
 
 const { Search } = Input;
 const { Option } = Select;
@@ -41,6 +42,7 @@ export default function LinksPage() {
   const [isModelVisible, setIsModalVisible] = useState(false);
   const { openNotification } = useNotification();
   const [editingLink, setEditingLink] = useState<LinkType | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const _fetchData = async () => {
@@ -130,7 +132,15 @@ export default function LinksPage() {
       key: "action",
       render: (_, record: LinkType) => (
         <Space size="middle">
-          <Button type="link" icon={<SiSimpleanalytics color={"#7C3AED"} />}>
+          <Button
+            type="link"
+            icon={<SiSimpleanalytics color={"#7C3AED"} />}
+            onClick={() =>
+              router.push(
+                `/dashboard/analytics?link_id=${encodeURIComponent(record.id)}`,
+              )
+            }
+          >
             Analytics
           </Button>
           <Button
