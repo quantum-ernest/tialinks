@@ -93,6 +93,8 @@ export default function UtmPage() {
       title: "Link Count",
       dataIndex: "link_count",
       key: "link_count",
+      sorter: (a: UtmType, b: UtmType) =>
+        (a.link_count ?? 0) - (b.link_count ?? 0),
       render: (link_count) => (
         <Tag color={link_count > 1 ? "green" : "volcano"} key={link_count}>
           {link_count}
