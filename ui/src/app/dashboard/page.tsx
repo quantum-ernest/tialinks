@@ -151,7 +151,7 @@ export default function Dashboard() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="click_count" fill="#82ca9d" />
+                      <Bar dataKey="click_count" fill="#82ca9d" name="Clicks" />
                     </BarChart>
                   </ResponsiveContainer>
                 </Card>
@@ -266,6 +266,7 @@ export default function Dashboard() {
                         type="monotone"
                         dataKey="click_count"
                         stroke="#8884d8"
+                        name="Clicks"
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -284,7 +285,7 @@ export default function Dashboard() {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="click_count" fill="#8884d8" />
+                      <Bar dataKey="click_count" fill="#8884d8" name="Clicks" />
                     </BarChart>
                   </ResponsiveContainer>
                 </Card>

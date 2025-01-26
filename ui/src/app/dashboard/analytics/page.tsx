@@ -153,7 +153,7 @@ const EnhancedAnalytics: React.FC = () => {
                   <XAxis dataKey="campaign" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="click_count" fill="#8884d8" />
+                  <Bar dataKey="click_count" fill="#8884d8" name="Clicks" />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
@@ -341,6 +341,7 @@ const EnhancedAnalytics: React.FC = () => {
                     type="monotone"
                     dataKey="click_count"
                     stroke="#8884d8"
+                    name="Clicks"
                   />
                 </LineChart>
               </ResponsiveContainer>

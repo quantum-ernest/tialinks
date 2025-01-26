@@ -146,7 +146,7 @@ export default function GeographicalMap({
                   <Popup>
                     <div>
                       <h3>{name}</h3>
-                      <p>{click_count.toLocaleString()} clicks</p>
+                      <p>{click_count.toLocaleString()} Clicks</p>
                     </div>
                   </Popup>
                 </CircleMarker>
