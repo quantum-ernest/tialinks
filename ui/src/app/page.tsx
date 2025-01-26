@@ -44,9 +44,11 @@ import { useAuthContext } from "@/hooks/Auth";
 import { LinkType } from "@/schemas/Link";
 import PrivacyPolicy from "@/components/PrivacyPolicy";
 import TermsOfService from "@/components/TermsOfService";
+import { IoSendOutline } from "react-icons/io5";
 
 const { Header, Content, Footer } = Layout;
 const { Title, Paragraph, Text, Link } = Typography;
+const { Search } = Input;
 export default function Home() {
   const { isAuthenticated, checkAuth, setIsAuthenticated, logout } =
     useAuthContext();
@@ -271,9 +273,13 @@ export default function Home() {
                       "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
                   }}
                 >
-                  <Input.Search
+                  <Search
                     placeholder="Enter your long URL here"
-                    enterButton
+                    enterButton={
+                      <Button type="primary" style={{ height: 50 }}>
+                        <IoSendOutline />
+                      </Button>
+                    }
                     addonBefore={<LinkOutlined />}
                     size="large"
                     value={url ?? ""}
