@@ -4,7 +4,7 @@ export const UtmSchema = z.object({
   id: z.number(),
   campaign: z.string(),
   source: z.string(),
-  medium: z.string(),
+  medium: z.string().nullable(),
   link_count: z.number().optional(),
 });
 
