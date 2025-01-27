@@ -52,3 +52,7 @@ class UtmMapper(Base):
             if record
             else session.scalars(insert(cls).returning(cls), utm_data).first()
         )
+
+    @classmethod
+    def get_all(cls, session: Session, user_id: int):
+        return session.scalars(select(cls).where(cls.user_id==user_id).order_by(cls.id.desc())).all()
