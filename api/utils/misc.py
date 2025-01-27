@@ -68,13 +68,13 @@ def extract_utm_data(url: str) -> dict:
     parsed_url = urlparse(url)
     query_params = parse_qs(parsed_url.query)
     utm_data = {
-        "utm_source": query_params.get("utm_source")[0]
+        "source": query_params.get("utm_source")[0]
         if query_params.get("utm_source")
         else "N/A",
-        "utm_medium": query_params.get("utm_medium")[0]
+        "medium": query_params.get("utm_medium")[0]
         if query_params.get("utm_medium")
         else "N/A",
-        "utm_campaign": query_params.get("utm_campaign")[0]
+        "campaign": query_params.get("utm_campaign")[0]
         if query_params.get("utm_campaign")
         else "N/A",
     }

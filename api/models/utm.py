@@ -41,11 +41,12 @@ class UtmMapper(Base):
         record = session.scalars(
             select(cls).filter_by(
                 user_id=user_id,
-                campaign=utm_data["utm_campaign"],
-                source=utm_data["utm_source"],
-                medium=utm_data["utm_medium"],
+                campaign=utm_data["campaign"],
+                source=utm_data["source"],
+                medium=utm_data["medium"],
             )
         ).first()
+        utm_data.update({"user_id": user_id})
         return (
             record
             if record
