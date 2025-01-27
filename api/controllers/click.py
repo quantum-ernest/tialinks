@@ -32,45 +32,42 @@ async def redirect(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"TiaLinks: Unable to locate shortcode /{shortcode}",
         )
-    if link.expires_at < datetime.now():
+    if link.expires_at and link.expires_at < datetime.now():
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="TiaLinks: Shortcode not active",
         )
     user_agent_data = request.headers.get("User-Agent")
     user_agent = (
-        UserAgentMapper.create(session=session, user_agent=user_agent_data)
+        UserAgentMapper.create_from_link(session=session, user_agent=user_agent_data)
         if user_agent_data
-        else None
+        else UserAgentMapper.create(session=session, data={"user_agent": "N/A","browser": "N/A","operating_system": "N/A","device": "N/A"})
     )
 
     ip_address = request.client.host
     location = (
-        LocationMapper.create(session=session, ip_address=ip_address)
+        LocationMapper.create_from_link(session=session, ip_address=ip_address)
         if ip_address
-        else None
+        else LocationMapper.create(session=session, data={"continent": "N/A","country": "N/A","region": "N/A","city": "N/A"})
     )
 
     referer_data = request.headers.get("Referer")
     referer = (
-        RefererMapper.create(session=session, referer=referer_data)
+        RefererMapper.create_from_link(session=session, referer=referer_data)
         if referer_data
-        else None
+        else RefererMapper.create(session=session, data={"full_url": "N/A","domain": "N/A"})
     )
     click_obj = {
         "link_id": link.id,
         "user_id": link.user_id,
-        "user_agent_id": user_agent.id if user_agent else None,
-        "location_id": location.id if location else None,
-        "referer_id": referer.id if referer else None,
+        "user_agent_id": user_agent.id,
+        "location_id": location.id,
+        "referer_id": referer.id,
     }
     click = ClickMapper.create(session=session, data=click_obj)
     link.increment_count(session)
-    utm = (
-        UtmMapper.get_by_id(session=session, pk_id=link.utm_id, user_id=link.user_id)
-        if link.utm_id
-        else None
-    )
+    utm = UtmMapper.get_by_id(session=session, pk_id=link.utm_id, user_id=link.user_id)
+
     link_interaction = {
         "created_at": click.created_at,
         "link_id": link.id,

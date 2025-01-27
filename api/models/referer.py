@@ -13,7 +13,7 @@ class RefererMapper(Base):
     click: Mapped["ClickMapper"] = relationship(back_populates="referer")
 
     @classmethod
-    def create(cls, session: Session, **kwargs):
+    def create_from_link(cls, session: Session, **kwargs):
         referer = kwargs.get("referer")
         referer_data = extract_referer(referer)
         record = session.scalars(

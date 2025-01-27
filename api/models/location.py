@@ -14,7 +14,7 @@ class LocationMapper(Base):
     click: Mapped["ClickMapper"] = relationship(back_populates="location")
 
     @classmethod
-    def create(cls, session: Session, **kwargs):
+    def create_from_link(cls, session: Session, **kwargs):
         ip_address = kwargs.get("ip_address")
         location_data = extract_location(ip_address)
         record = session.scalars(
