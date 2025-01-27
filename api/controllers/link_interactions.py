@@ -31,7 +31,7 @@ async def get_dashboard_summary(
         if total_links > 0
         else 0,
         "link_click_percentage": round(
-            ((distinct_total_links / total_clicks) if total_links else 0) * 100, 2
+            ((distinct_total_links / total_clicks) if total_clicks else 0) * 100, 2
         ),
         "top_performing_links": LinkInteractionMapper.get_top_performing_links(
             session=session, user_id=auth_user["user_id"]
