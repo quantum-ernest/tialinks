@@ -34,7 +34,7 @@ TiaLinks is an open-source URL shortening and analytics tool that simplifies URL
 - Support for custom domains for personalized, branded links.
 - AI for predictions.
 - Dynamic redirects.
-- ~~Password protection supported~~
+- Password protection supported ✅
 - Bulk CSV Import URLs
 - Browser estentions
 
