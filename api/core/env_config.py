@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class EnvConfig(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file="dev.env", env_file_encoding="utf-8")
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
     POSTGRES_DB_NAME: str
@@ -17,6 +17,7 @@ class EnvConfig(BaseSettings):
     EMAIL_SERVER_ADDRESS: EmailStr
     EMAIL_HOST_PASSWORD: str
     BASE_URL: str
+    FRONTEND_BASE_URL: str
     REDIS_HOST: str | None = "localhost"
     REDIS_PORT: int | None = "6379"
 

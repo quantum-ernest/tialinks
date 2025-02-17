@@ -27,13 +27,14 @@ TiaLinks is an open-source URL shortening and analytics tool that simplifies URL
 - 🌎 **Geographical Insights**: Gather geographical data like continent, country, city, and region for each click while ensuring user privacy by not saving IPs or coordinates.
 - 🌍 **Interactive Map**: Visualize geographical data on an interactive map for better insights.
 - ✉️ **Email OTP Authentication**: Secure user access with an OTP-based authentication mechanism. OTPs are valid for 5 minutes to ensure enhanced security.
+- 🔒 **Password Protection**: Protect your shortened links with a password for additional security.
 
 📜️ Pending Features
 --------------------
 - Support for custom domains for personalized, branded links.
 - AI for predictions.
 - Dynamic redirects.
-- Password protection supported.
+- ~~Password protection supported~~
 - Bulk CSV Import URLs
 - Browser estentions
 

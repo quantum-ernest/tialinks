@@ -13,6 +13,7 @@ export const LinkSchema = z.object({
   utm_id: z.number().nullable(),
   utm: UtmSchema.nullable(),
   expires_at: z.string().nullable(),
+  password_protected: z.boolean(),
 });
 
 export const LinkArraySchema = z.array(LinkSchema);

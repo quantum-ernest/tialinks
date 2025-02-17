@@ -5,6 +5,7 @@ from typing import Optional
 from schemas import UserSchemaOut, UtmLinkSchemaOut
 
 
+
 class LinkSchemaIn(BaseModel):
     original_url: AnyUrl
     utm_id: Optional[int] = None
@@ -16,14 +17,22 @@ class LinkSchemaUpdate(BaseModel):
     expires_at: Optional[datetime] = None
 
 
-class LinkSchemaOut(LinkSchemaIn):
+class LinkSchemaOut(BaseModel):
+    original_url: AnyUrl
+    utm_id: Optional[int] = None
+    expires_at: Optional[datetime] = None
     generated_url: str
     shortcode: str
     count: int
     utm: Optional[UtmLinkSchemaOut] = None
-    expires_at: Optional[datetime] = None
     user: UserSchemaOut
     created_at: datetime
     favicon_url: str
     status: Optional[str] = None
+    password_protected: bool
+    id: int
+
+
+class SetPasswordSchema(BaseModel):
+    password: Optional[str] = None
     id: int

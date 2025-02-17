@@ -8,6 +8,7 @@ export const useLinks = () => {
   const [loading, setLoading] = useState(false);
   const [linkData, setLinkData] = useState<LinkType[] | null>(null);
   const apiUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+  const apiUrl_ = process.env.NEXT_PUBLIC_BACKEND_BASE_URL_;
 
   const fetchLinks = async () => {
     try {
@@ -144,6 +145,104 @@ export const useLinks = () => {
       setLoading(false);
     }
   };
+
+  const authenticateLink = async (password: string, shortcode: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        apiUrl_ + `/${shortcode}?password=${password}`,
+        {
+          method: "GET",
+          redirect: "follow",
+        },
+      );
+      if (response.redirected) {
+        window.location.href = response.url;
+        return;
+      }
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        openNotification("error", error.message);
+      } else {
+        openNotification("error", "Unknown error occurred");
+        console.log(error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setAuthenticationOnLink = async (password: string, id: number) => {
+    try {
+      setLoading(true);
+      const token = getToken();
+      const response = await fetch(apiUrl + `/links/password/set`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          password: password,
+          id: id,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      setLinkData(
+        (linkData ?? []).map((link) =>
+          link.id === id ? { ...link, password_protected: true } : link,
+        ),
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        openNotification("error", error.message);
+      } else {
+        openNotification("error", "Unknown error occurred");
+        console.log(error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const disableAuthenticationOnLink = async (id: number) => {
+    try {
+      setLoading(true);
+      const token = getToken();
+      const response = await fetch(apiUrl + `/links/password/set`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: id,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      setLinkData(
+        (linkData ?? []).map((link) =>
+          link.id === id ? { ...link, password_protected: false } : link,
+        ),
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        openNotification("error", error.message);
+      } else {
+        openNotification("error", "Unknown error occurred");
+        console.log(error);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
   return {
     loading,
     linkData,
@@ -151,5 +250,8 @@ export const useLinks = () => {
     createLink,
     updateLink,
     openNotification,
+    authenticateLink,
+    setAuthenticationOnLink,
+    disableAuthenticationOnLink,
   };
 };

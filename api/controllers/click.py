@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import RedirectResponse
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from core import get_db_session
+from core import get_db_session, env
 from models import (
     ClickMapper,
     LinkMapper,
@@ -15,7 +15,7 @@ from models import (
     UtmMapper,
 )
 from schemas import ClickSchemaOut
-from services import IsAuthenticated
+from services import IsAuthenticated, AuthService
 
 router = APIRouter(tags=["CLICK"])
 
@@ -24,6 +24,7 @@ router = APIRouter(tags=["CLICK"])
 async def redirect(
     shortcode: str,
     request: Request,
+    password: str|None = None,
     session: Session = Depends(get_db_session),
 ):
     link = LinkMapper.get_by_shortcode(session, shortcode)
@@ -37,6 +38,12 @@ async def redirect(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="TiaLinks: Shortcode not active",
         )
+    if link.password and not password:
+        return f"{env.FRONTEND_BASE_URL}/link/password?shortcode={shortcode}"
+    if link.password and password:
+        verify = AuthService.verify_password(password, link.password)
+        if not verify:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect password")
     user_agent_data = request.headers.get("User-Agent")
     user_agent = (
         UserAgentMapper.create_from_link(session=session, user_agent=user_agent_data)
