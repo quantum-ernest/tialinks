@@ -23,6 +23,7 @@ class LinkMapper(Base):
         ForeignKey("user.id", ondelete="SET NULL"),
     )
     favicon_url: Mapped[str]
+    password: Mapped[Optional[str]]
 
     user: Mapped["UserMapper"] = relationship(back_populates="link")
     click: Mapped["ClickMapper"] = relationship(back_populates="link")
@@ -31,6 +32,10 @@ class LinkMapper(Base):
     @hybridproperty
     def status(self):
         return ""
+
+    @hybridproperty
+    def password_protected(self):
+        return True if self.password else False
 
     @classmethod
     def get_by_id(cls, session: Session, pk_id: int, **kwargs):
@@ -74,3 +79,8 @@ class LinkMapper(Base):
         self.count += 1
         session.commit()
         return
+
+    def set_password(self, session: Session, password: str|None)->bool:
+        self.password = password
+        session.commit()
+        return True

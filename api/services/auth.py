@@ -18,6 +18,14 @@ class AuthService:
     pwd_context = CryptContext(schemes=["sha256_crypt"])
 
     @classmethod
+    def hash_password(cls, password: str) -> str:
+        return cls.pwd_context.hash(password)
+
+    @classmethod
+    def verify_password(cls, plain_password: str, hashed_password: str):
+        return cls.pwd_context.verify(plain_password, hashed_password)
+
+    @classmethod
     def create_access_token(cls, data: dict) -> str:
         encoded_jwt = jwt.encode(
             data.copy(), env.AUTH_SECRETE_KEY, algorithm=env.AUTH_ALGORITHM

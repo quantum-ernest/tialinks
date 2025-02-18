@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from core import get_db_session, env
 from typing import List
 from models import LinkMapper, UtmMapper
-from schemas import LinkSchemaOut, LinkSchemaIn, LinkSchemaUpdate
-from services import IsAuthenticated
+from schemas import LinkSchemaOut, LinkSchemaIn, LinkSchemaUpdate, SetPasswordSchema
+from services import IsAuthenticated, AuthService
 from utils import generate_readable_short_code, build_favicon_url, update_link_status
 
 router = APIRouter(prefix="/api/v1/links", tags=["LINK"])
@@ -93,3 +93,20 @@ async def update(
         }
     )
     return update_link_status([LinkMapper.update(session, data=data)])[0]
+
+
+@router.post("/password/set")
+def change_password(
+    data: SetPasswordSchema,
+    session: Session = Depends(get_db_session),
+    auth_user: dict = Depends(IsAuthenticated()),
+):
+    val_link = LinkMapper.get_by_id(session, data.id, user_id=auth_user["user_id"])
+    if not val_link:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Link not found"
+        )
+
+    password = AuthService.hash_password(data.password) if data.password else None
+    val_link.set_password(session, password)
+    return {"message" :"Password set successfully"}
