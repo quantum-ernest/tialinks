@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, Form, Input, Typography } from "antd";
+import { Button, Card, Form, Input, Spin, Typography } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import "../../styles/login.css";
 import { useSearchParams } from "next/navigation";
@@ -63,7 +63,7 @@ export default function LinkLoginPage() {
             </Title>
           </div>
           <div className="login-form">
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<Spin size="large" fullscreen />}>
               <LinkLoginForm />
             </Suspense>
           </div>
