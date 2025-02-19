@@ -1,1 +1,2 @@
 NEXT_PUBLIC_BACKEND_BASE_URL=
+NEXT_PUBLIC_BACKEND_BASE_URL_= (base url without api version)
