@@ -202,9 +202,8 @@ export default function QRCodeGenerator() {
                     defaultValue="tialinks.com"
                     onChange={(value) =>
                       setSelectedLink(
-                        linkData?.find(
-                          (link) => link.generated_url === value,
-                        ) || null,
+                        linkData?.find((link) => link.id === Number(value)) ||
+                          null,
                       )
                     }
                   >
