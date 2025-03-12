@@ -106,7 +106,7 @@ export default function Home() {
         router.push("/api");
         break;
       case "donate":
-        window.open("#", "_blank");
+        window.open("https://github.com/sponsors/quantum-ernest", "_blank");
         break;
       case "login":
         router.push("/login");
